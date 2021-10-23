@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <!-- Add Your favicon here -->
+        <!--<link rel="icon" href="img/favicon.ico">-->
+
+        <title>Pixiv Project - Mikoto</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet" />
+
+        <!-- Animation CSS -->
+        <link href="css/animate.css" rel="stylesheet" />
+
+        <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+
+        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+            <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <!-- Custom styles for this template -->
+        <link href="css/style.css" rel="stylesheet" />
+    </head>
+    <body id="page-top" class="landing-page">
+        <script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+        <script>
+            try {
+                var userIp = returnCitySN["cip"];
+            } catch (error) {
+                alert(
+                    "提醒:我们需要确定您的真实IP,以防止机器人攻击.请关闭ADBlock等软件,因为这会阻止我们获取您的IP"
+                );
+                document.getElementsByTagName("html")[0].innerHTML =
+                    "提醒:我们需要确定您的真实IP,以防止机器人攻击.请关闭ADBlock等软件,因为这会阻止我们获取您的IP";
+            }
+        </script>
+        <div class="navbar-wrapper">
+            <nav
+                class="navbar navbar-default navbar-fixed-top navbar-expand-md"
+                role="navigation"
+            >
+                <div class="container">
+                    <a class="navbar-brand" href="index.html">MIKOTO</a>
+                    <div class="navbar-header page-scroll">
+                        <button
+                            class="navbar-toggler"
+                            type="button"
+                            data-toggle="collapse"
+                            data-target="#navbar"
+                        >
+                            <i class="fa fa-bars"></i>
+                        </button>
+                    </div>
+                    <div
+                        class="collapse navbar-collapse justify-content-end"
+                        id="navbar"
+                    >
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a class="nav-link" href="console/">控制面板</a>
+                            </li>
+                            <li>
+                                <a class="nav-link" href="login/">登录/注册</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div id="inSlider" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+                <li
+                    data-target="#inSlider"
+                    data-slide-to="0"
+                    class="active"
+                ></li>
+                <li data-target="#inSlider" data-slide-to="1"></li>
+            </ol>
+            <div class="carousel-inner" role="listbox">
+                <div class="carousel-item active">
+                    <div class="container">
+                        <div class="carousel-caption">
+                            <h1>
+                                Pixiv-Project<br />
+                                2021.9
+                            </h1>
+                            <p>最好的Pixiv机器人服务</p>
+                            <p>
+                                <a
+                                    class="btn btn-lg btn-primary"
+                                    href="console/"
+                                    role="button"
+                                    >控制面板</a
+                                >
+                            </p>
+                        </div>
+                        <div class="carousel-image wow zoomIn">
+                            <img src="img/laptop.png" alt="laptop" />
+                        </div>
+                    </div>
+                    <!-- Set background for slide in css -->
+                    <div class="header-back one"></div>
+                </div>
+                <div class="carousel-item">
+                    <!-- Set background for slide in css -->
+                    <div class="header-back two"></div>
+                </div>
+            </div>
+        </div>
+
+        <section id="features" class="container services">
+            <div class="row">
+                <div class="col-sm-3">
+                    <h2>超大数据库</h2>
+                    <p>我们储存了几乎所有的Pixiv上的作品信息数据</p>
+                </div>
+                <div class="col-sm-3">
+                    <h2>实时更新</h2>
+                    <p>
+                        我们会不断的从Pixiv获取相应的数据 并存储在我们的数据中心
+                    </p>
+                </div>
+                <div class="col-sm-3">
+                    <h2>遍历世界各地的服务</h2>
+                    <p>
+                        我们在美国 日本 香港 新加坡 等地区均部署了我们的转发服务
+                        以确保此项目的运行
+                    </p>
+                </div>
+                <div class="col-sm-3">
+                    <h2>高效的速度</h2>
+                    <p>经过我们的测试 单张高清图片的查询速度最快可达到500ms</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="team" class="gray-section team">
+            <div class="container">
+                <div class="row m-b-lg">
+                    <div class="col-lg-12 text-center">
+                        <div class="navy-line"></div>
+                        <h1>MIKOTO团队</h1>
+                        <p>如果您也想要加入我们的创作 请联系我(zklcoca)</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="team-member wow zoomIn">
+                            <img
+                                src="img/avatar1.jpg"
+                                class="img-fluid rounded-circle"
+                                alt=""
+                            />
+                            <h4><span class="navy">zkl</span> coca</h4>
+                            <p>MIKOTO团队主要开发者 全践工程师</p>
+                            <ul class="list-inline social-icon">
+                                <li class="list-inline-item">
+                                    <a href="https://github.com/zklc0ca/"
+                                        ><i class="fa fa-github"></i
+                                    ></a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a
+                                        href="tencent://message/?uin=921289181&Site=&Menu=yes"
+                                        ><i class="fa fa-qq"></i
+                                    ></a>
+                                </li>
+                                <li class="list-inline-item">
+                                    <a href="mailto:zklcoca@163.com"
+                                        ><i class="fa fa-envelope"></i
+                                    ></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script src="js/jquery-2.1.1.js"></script>
+        <script src="js/pace.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/classie.js"></script>
+        <script src="js/cbpAnimatedHeader.js"></script>
+        <script src="js/wow.min.js"></script>
+        <script src="js/inspinia.js"></script>
+    </body>
+</html>
