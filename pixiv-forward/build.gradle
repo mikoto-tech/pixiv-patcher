@@ -1,0 +1,25 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'net.mikoto.pixiv'
+version = '1.0.0'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.alibaba:fastjson:1.2.78'
+    runtimeOnly 'mysql:mysql-connector-java'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+}
+
+test {
+    useJUnitPlatform()
+}
