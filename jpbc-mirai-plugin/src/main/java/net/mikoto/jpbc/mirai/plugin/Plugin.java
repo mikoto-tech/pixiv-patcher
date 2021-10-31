@@ -5,6 +5,7 @@ import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
 import net.mikoto.jpbc.mirai.plugin.httphandler.JpbcInfoHandler;
 import net.mikoto.jpbc.mirai.plugin.httphandler.RegisterClientHandler;
+import net.mikoto.jpbc.mirai.plugin.httphandler.RegisterQqHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -42,6 +43,7 @@ public class Plugin extends JavaPlugin {
             server = HttpServer.create(new InetSocketAddress(HTTP_API_PORT), 0);
             server.createContext("/JpbcInfo", new JpbcInfoHandler());
             server.createContext("/RegisterClient", new RegisterClientHandler());
+            server.createContext("/RegisterQQ", new RegisterQqHandler());
             server.start();
         } catch (IOException e) {
             System.err.println("[Java Pixiv Bot Connectivity] Error: Can't create http server.");

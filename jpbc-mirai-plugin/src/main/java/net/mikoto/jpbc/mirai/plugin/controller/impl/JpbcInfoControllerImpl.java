@@ -11,7 +11,7 @@ import java.io.IOException;
  * @author mikoto
  * @date 2021/10/23 20:01
  */
-public class JpbcInfoControllerImpl implements JpbcInfoController {
+public class JpbcInfoControllerImpl extends JpbcInfoController {
     private final AbstractHttpExchangeView httpExchangeView;
 
     public JpbcInfoControllerImpl(AbstractHttpExchangeView httpExchangeView) {
@@ -19,13 +19,12 @@ public class JpbcInfoControllerImpl implements JpbcInfoController {
     }
 
     /**
-     * Jpbc info controller 入口方法
+     * 根据HttpExchange更新Jpbc数据
      *
-     * @param httpExchange http响应
-     * @throws IOException A error.
+     * @param httpExchange Http exchange object.
      */
     @Override
-    public void entry(HttpExchange httpExchange) throws IOException {
+    protected void updateJpbcInfo(HttpExchange httpExchange) throws IOException {
         httpExchangeView.update(httpExchange, Plugin.VERSION, Plugin.DESCRIPTION, Plugin.AUTHOR, Plugin.PACKAGE, Plugin.HTTP_API_PORT);
     }
 }
