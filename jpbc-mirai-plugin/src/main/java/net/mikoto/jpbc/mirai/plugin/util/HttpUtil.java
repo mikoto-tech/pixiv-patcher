@@ -1,10 +1,16 @@
 package net.mikoto.jpbc.mirai.plugin.util;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author mikoto
@@ -36,6 +42,24 @@ public class HttpUtil {
                 }
             }
         });
+        return result;
+    }
+
+
+    /**
+     * Send a get request.
+     * It will return a string.
+     *
+     * @param url The link of this request.
+     * @return The string this request return.
+     * @throws IOException IOException.
+     */
+    public static String httpGet(String url) throws IOException {
+        String result;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).build();
+        Response response = client.newCall(request).execute();
+        result = Objects.requireNonNull(response.body()).string();
         return result;
     }
 }

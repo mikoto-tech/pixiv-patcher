@@ -45,7 +45,7 @@ public class RegisterClientViewImpl extends AbstractHttpExchangeView {
             clientRegisterBody.put("key", client.getClientKey());
             clientRegisterBody.put("callbackIp", client.getClientCallbackIp());
             clientRegisterBody.put("callbackPort", client.getClientCallbackPort());
-            clientRegisterBody.put("QQIds", client.getClientIds());
+            clientRegisterBody.put("QQIds", client.getClientQqIds());
         }
 
         outputJson.put("body", clientRegisterBody);

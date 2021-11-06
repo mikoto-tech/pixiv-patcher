@@ -9,25 +9,25 @@ import java.util.Map;
  * @author mikoto
  * @date 2021/10/23 18:45
  */
-abstract public class RegisterClientController {
+abstract public class RegisterClientController implements ControllerEntry {
     /**
      * 根据HttpExchange更新RegisterClient数据
      *
      * @param httpExchange Http exchange object.
+     * @param fromData     Data input.
      * @throws IOException A error.
      */
-    protected abstract void updateRegisterClient(HttpExchange httpExchange) throws IOException;
+    protected abstract void registerClient(HttpExchange httpExchange, Map<String, String> fromData) throws IOException;
 
     /**
      * Register client controller 入口方法
      *
      * @param httpExchange http响应
-     * @param objects Others objects.
+     * @param fromData     Data input.
      * @throws IOException A error.
      */
-    public void entry(HttpExchange httpExchange, Object... objects) throws IOException {
-        if (objects[0] instanceof Map<?, ?>) {
-
-        }
-    };
+    @Override
+    public void entry(HttpExchange httpExchange, Map<String, String> fromData) throws IOException {
+        registerClient(httpExchange, fromData);
+    }
 }

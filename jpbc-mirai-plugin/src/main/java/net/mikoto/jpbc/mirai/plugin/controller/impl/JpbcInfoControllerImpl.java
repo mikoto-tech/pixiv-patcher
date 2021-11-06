@@ -1,11 +1,12 @@
 package net.mikoto.jpbc.mirai.plugin.controller.impl;
 
 import com.sun.net.httpserver.HttpExchange;
-import net.mikoto.jpbc.mirai.plugin.Plugin;
+import net.mikoto.jpbc.mirai.plugin.JpbcMiraiPlugin;
 import net.mikoto.jpbc.mirai.plugin.controller.JpbcInfoController;
 import net.mikoto.jpbc.mirai.plugin.view.AbstractHttpExchangeView;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author mikoto
@@ -24,7 +25,7 @@ public class JpbcInfoControllerImpl extends JpbcInfoController {
      * @param httpExchange Http exchange object.
      */
     @Override
-    protected void updateJpbcInfo(HttpExchange httpExchange) throws IOException {
-        httpExchangeView.update(httpExchange, Plugin.VERSION, Plugin.DESCRIPTION, Plugin.AUTHOR, Plugin.PACKAGE, Plugin.HTTP_API_PORT);
+    protected void updateJpbcInfo(HttpExchange httpExchange, Map<String, String> fromData) throws IOException {
+        httpExchangeView.update(httpExchange, JpbcMiraiPlugin.VERSION, JpbcMiraiPlugin.DESCRIPTION, JpbcMiraiPlugin.AUTHOR, JpbcMiraiPlugin.PACKAGE, JpbcMiraiPlugin.HTTP_API_PORT);
     }
 }

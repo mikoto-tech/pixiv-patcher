@@ -5,7 +5,7 @@ import net.mikoto.jpbc.mirai.plugin.view.AbstractHttpExchangeView;
 
 /**
  * @author mikoto
- * @date 2021/10/30 16:34
+ * @date 2021/11/6 22:44
  */
 public class RegisterQqViewImpl extends AbstractHttpExchangeView {
     /**

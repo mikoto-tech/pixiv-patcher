@@ -1,6 +1,7 @@
 package net.mikoto.jpbc.mirai.plugin.client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,26 +27,22 @@ public class ClientManager {
      * - Normal 正常运行
      * 不同状态的客户端对应的id会储存在ArrayList中,已经移除的客户端将会被移除
      */
-    private final ArrayList<Integer> unverifiedClientArrayList = new ArrayList<>();
-    private final ArrayList<Integer> normalClientArrayList = new ArrayList<>();
-
-    /**
-     * 初始化Map
-     */
-    private final Map<String, Integer> clientCodeMap = new HashMap<>();
+    protected final Map<String, Integer> unverifiedClientMap = new HashMap<>();
+    protected final Map<String, Integer> normalClientMap = new HashMap<>();
+    private Date nextConfirmTime;
 
     public static ClientManager getInstance() {
         return INSTANCE;
     }
 
     /**
-     * Get client form the client array list by id.
+     * Get client form the client array list by key.
      *
      * @param key The key of this client.
      * @return A client object. If there is no client with corresponding ID, null is returned
      */
-    public Client getClient(String key) {
-        return clientArrayList.get(clientCodeMap.get(key));
+    public Client getClientByKey(String key) {
+        return clientArrayList.get(normalClientMap.get(key));
     }
 
     /**
@@ -116,39 +113,52 @@ public class ClientManager {
         Client client = clientArrayList.get(clientCode);
         String key;
 
-        if (clientCodeMap.containsValue(clientCode)) {
-            clientCode = clientCodeMap.remove(client.getClientKey());
+        if (normalClientMap.containsValue(clientCode)) {
+            clientCode = normalClientMap.remove(client.getClientKey());
         }
 
         key = client.update();
-        clientCodeMap.put(key, clientCode);
+        unverifiedClientMap.put(key, clientCode);
+
 
         return key;
     }
 
     /**
-     * 删除客户端
+     * remove the client in memory
      *
-     * @param key        客户端的对对应key
-     * @param callbackIp 客户端的回调ip
-     * @return 是否成功
+     * @param key The key of this client.
+     * @return Is success
      */
-    public boolean removeClient(String key, String callbackIp) {
-        Integer clientCode = clientCodeMap.get(key);
+    protected boolean removeClient(String key) {
+        Integer clientCode = null;
+        if (normalClientMap.containsKey(key)) {
+            clientCode = normalClientMap.remove(key);
+        } else if (unverifiedClientMap.containsKey(key)) {
+            clientCode = unverifiedClientMap.remove(key);
+        }
 
         if (clientCode != null) {
-            Client client = clientArrayList.get(clientCode);
-
-            if (client.getClientCallbackIp().equals(callbackIp)) {
-                clientCodeMap.remove(key, clientCode);
-                clientArrayList.remove(client);
-                return true;
-
-            } else {
-                return false;
-            }
+            clientArrayList.remove(clientCode.intValue());
+            return true;
         } else {
             return false;
         }
+    }
+
+    public Date getNextConfirmTime() {
+        return nextConfirmTime;
+    }
+
+    protected void setNextConfirmTime(Date nextConfirmTime) {
+        this.nextConfirmTime = nextConfirmTime;
+    }
+
+    public Map<String, Integer> getUnverifiedClientMap() {
+        return unverifiedClientMap;
+    }
+
+    public void setNormalClient(String key) {
+        normalClientMap.put(key, unverifiedClientMap.remove(key));
     }
 }

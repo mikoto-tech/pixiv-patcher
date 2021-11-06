@@ -2,6 +2,9 @@ package net.mikoto.jpbc.mirai.plugin.client;
 
 import net.mikoto.jpbc.mirai.plugin.util.Sha256Util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author mikoto
  * @date 2021/10/16 17:57
@@ -10,7 +13,7 @@ public class Client {
     private String clientCallbackIp;
     private Integer clientCallbackPort;
     private String clientKey;
-    private Integer[] clientIds;
+    private final List<Integer> clientQqIds = new ArrayList<>();
 
     public String update() {
         clientKey = Sha256Util.getSha256(clientCallbackIp + ":MIKOTO_JAVA_PIXIV_BOT_CONNECTIVITY_KEY:114514:1919810:" + System.currentTimeMillis());
@@ -35,13 +38,18 @@ public class Client {
         return this;
     }
 
-    public Integer[] getClientIds() {
-        return clientIds;
+    public List<Integer> getClientQqIds() {
+        return clientQqIds;
     }
 
-    public Client setClientIds(Integer[] clientIds) {
-        this.clientIds = clientIds;
-        return this;
+    public List<Integer> addQqId(Integer qqId) {
+        clientQqIds.add(qqId);
+        return clientQqIds;
+    }
+
+    public List<Integer> removeQqId(Integer qqId) {
+        clientQqIds.remove(qqId);
+        return clientQqIds;
     }
 
     public String getClientKey() {

@@ -13,7 +13,7 @@ import java.util.Map;
  * @author mikoto
  * @date 2021/10/23 18:46
  */
-public class RegisterClientControllerImpl implements RegisterClientController {
+public class RegisterClientControllerImpl extends RegisterClientController {
     private static final String GET_CALLBACK_PORT = "callbackPort";
     private static final String GET_CALLBACK_IP = "callbackIp";
     private final AbstractHttpExchangeView httpExchangeView;
@@ -23,13 +23,14 @@ public class RegisterClientControllerImpl implements RegisterClientController {
     }
 
     /**
-     * Register client controller 入口方法
+     * 根据HttpExchange更新RegisterClient数据
      *
-     * @param httpExchange http响应
-     * @param fromData     传入的数据
+     * @param httpExchange Http exchange object.
+     * @param fromData     Data input.
+     * @throws IOException A error.
      */
     @Override
-    public void entry(HttpExchange httpExchange, Map<String, String> fromData) throws IOException {
+    protected void registerClient(HttpExchange httpExchange, Map<String, String> fromData) throws IOException {
         String callbackIp = fromData.get(GET_CALLBACK_IP);
         int callbackPort = Integer.parseInt(fromData.get(GET_CALLBACK_PORT));
 

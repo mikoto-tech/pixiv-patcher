@@ -3,6 +3,7 @@ package net.mikoto.jpbc.mirai.plugin.controller;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author mikoto
@@ -13,9 +14,10 @@ abstract public class JpbcInfoController implements ControllerEntry{
      * 根据HttpExchange更新JpbcInfo数据
      *
      * @param httpExchange Http exchange object.
+     * @param fromData     Data
      * @throws IOException A error.
      */
-    protected abstract void updateJpbcInfo(HttpExchange httpExchange) throws IOException;
+    protected abstract void updateJpbcInfo(HttpExchange httpExchange, Map<String, String> fromData) throws IOException;
 
     /**
      * Jpbc info controller 入口方法
@@ -24,7 +26,7 @@ abstract public class JpbcInfoController implements ControllerEntry{
      * @throws IOException A error.
      */
     @Override
-    public void entry(HttpExchange httpExchange, Object... objects) throws IOException {
-        updateJpbcInfo(httpExchange);
-    };
+    public void entry(HttpExchange httpExchange, Map<String, String> fromData) throws IOException {
+        updateJpbcInfo(httpExchange, fromData);
+    }
 }
