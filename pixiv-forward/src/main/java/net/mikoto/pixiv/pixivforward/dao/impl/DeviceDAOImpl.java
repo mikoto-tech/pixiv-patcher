@@ -14,6 +14,17 @@ import java.text.SimpleDateFormat;
  * Project: pixiv-forward
  */
 public class DeviceDAOImpl extends BaseDAO implements DeviceDAO {
+    public DeviceDAOImpl(String url, String userName, String userPassword) {
+        super.userPassword = userPassword;
+        super.url = url;
+        super.userName = userName;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Query device in database.
      *

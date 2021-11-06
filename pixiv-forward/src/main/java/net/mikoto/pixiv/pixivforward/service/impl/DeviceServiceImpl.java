@@ -1,5 +1,6 @@
 package net.mikoto.pixiv.pixivforward.service.impl;
 
+import net.mikoto.pixiv.pixivforward.PixivForwardApplication;
 import net.mikoto.pixiv.pixivforward.dao.DeviceDAO;
 import net.mikoto.pixiv.pixivforward.dao.impl.DeviceDAOImpl;
 import net.mikoto.pixiv.pixivforward.model.Device;
@@ -12,7 +13,7 @@ import net.mikoto.pixiv.pixivforward.util.Sha256Util;
  * Project: pixiv-forward
  */
 public class DeviceServiceImpl implements DeviceService {
-    private final DeviceDAO deviceDAO = new DeviceDAOImpl();
+    private final DeviceDAO deviceDAO = new DeviceDAOImpl(PixivForwardApplication.URL, PixivForwardApplication.USER_NAME, PixivForwardApplication.USER_PASSWORD);
     private Device device;
 
     /**

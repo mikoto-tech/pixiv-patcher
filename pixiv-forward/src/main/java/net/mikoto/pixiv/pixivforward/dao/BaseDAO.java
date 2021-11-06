@@ -1,7 +1,5 @@
 package net.mikoto.pixiv.pixivforward.dao;
 
-import net.mikoto.pixiv.pixivforward.util.UserData;
-
 import java.sql.*;
 
 /**
@@ -14,6 +12,10 @@ abstract public class BaseDAO {
     private PreparedStatement preparedStatement;
     private ResultSet resultSet;
 
+    protected String url;
+    protected String userName;
+    protected String userPassword;
+
     /**
      * Get the connection.
      * If the connection is null, it will create one.
@@ -22,9 +24,9 @@ abstract public class BaseDAO {
      */
     public void getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection(UserData.getUrl(),
-                    UserData.getUserName(),
-                    UserData.getUserPassword());
+            connection = DriverManager.getConnection(url,
+                    userName,
+                    userPassword);
         }
     }
 
