@@ -11,6 +11,8 @@ import static net.mikoto.jpbc.mirai.plugin.util.HttpUtil.httpGet;
  * @date 2021/11/7 1:52
  */
 public class ClientConfirmThread extends Thread {
+    Thread thread;
+
     public ClientConfirmThread() {
         System.out.println("Creating client confirm thread.");
     }
@@ -39,6 +41,15 @@ public class ClientConfirmThread extends Thread {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public synchronized void start() {
+        System.out.println("Running client confirm thread.");
+        if (thread == null) {
+            thread = new Thread(this);
+            thread.start();
         }
     }
 }

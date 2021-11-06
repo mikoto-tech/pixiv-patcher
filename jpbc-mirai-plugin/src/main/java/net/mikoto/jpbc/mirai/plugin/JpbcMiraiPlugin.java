@@ -2,6 +2,7 @@ package net.mikoto.jpbc.mirai.plugin;
 
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
+import net.mikoto.jpbc.mirai.plugin.client.ClientConfirmThread;
 import net.mikoto.jpbc.mirai.plugin.controller.impl.JpbcInfoControllerImpl;
 import net.mikoto.jpbc.mirai.plugin.controller.impl.RegisterClientControllerImpl;
 import net.mikoto.jpbc.mirai.plugin.controller.impl.RegisterQqControllerImpl;
@@ -44,6 +45,8 @@ public class JpbcMiraiPlugin extends JavaPlugin {
                 .createContext("/RegisterClient", new RegisterClientControllerImpl(new RegisterClientViewImpl()))
                 .createContext("/RegisterQQ", new RegisterQqControllerImpl(new RegisterQqViewImpl()))
                 .start();
+        ClientConfirmThread clientConfirmThread = new ClientConfirmThread();
+        clientConfirmThread.start();
     }
 
     /**

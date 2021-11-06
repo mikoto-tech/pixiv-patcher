@@ -120,7 +120,6 @@ public class ClientManager {
         key = client.update();
         unverifiedClientMap.put(key, clientCode);
 
-
         return key;
     }
 
