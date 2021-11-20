@@ -16,11 +16,16 @@ public class PixivForwardApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(PixivForwardApplication.class, args);
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         // 初始化数据
         USER_PASSWORD = args[3];
         URL = "jdbc:mysql://" + args[0] + ":" + args[1] +
-                "/pixiv_data" +
+                "/pixiv_web_data" +
                 "?useSSL" +
                 "=false" +
                 "&allowPublicKeyRetrieval=true&serverTimezone=UTC";

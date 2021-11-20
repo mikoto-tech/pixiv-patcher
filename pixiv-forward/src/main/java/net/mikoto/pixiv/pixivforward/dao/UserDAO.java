@@ -1,21 +1,20 @@
 package net.mikoto.pixiv.pixivforward.dao;
 
-import net.mikoto.pixiv.pixivforward.model.Device;
+import net.mikoto.pixiv.pixivforward.model.User;
 
 import java.sql.SQLException;
 
 /**
  * @author mikoto
- * Created at 21:31:20, 2021/9/19
- * Project: PixivRelay
+ * @date 2021/11/20 5:28
  */
-public interface DeviceDAO {
+public interface UserDAO {
     /**
-     * Query device in database.
+     * Query user in database.
      *
      * @param sql SQL statement.
      * @return A device object
      * @throws SQLException SQLException
      */
-    Device getDevice(String sql) throws SQLException;
+    User getUser(String sql) throws SQLException;
 }

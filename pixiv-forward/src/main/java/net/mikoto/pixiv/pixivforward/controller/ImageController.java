@@ -1,9 +1,9 @@
 package net.mikoto.pixiv.pixivforward.controller;
 
-import net.mikoto.pixiv.pixivforward.service.DeviceService;
-import net.mikoto.pixiv.pixivforward.service.impl.DeviceServiceImpl;
+import net.mikoto.pixiv.pixivforward.PixivForwardApplication;
+import net.mikoto.pixiv.pixivforward.service.UserService;
+import net.mikoto.pixiv.pixivforward.service.impl.UserServiceImpl;
 import net.mikoto.pixiv.pixivforward.util.HttpUtil;
-import net.mikoto.pixiv.pixivforward.util.IpUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,12 +34,13 @@ public class ImageController {
             "image/jpeg"
     })
     public byte[] getImage(HttpServletRequest request,
-                           @RequestParam String url) {
+                           @RequestParam String url,
+                           @RequestParam String key) {
         // 初始化对象实例
-        DeviceService deviceService = new DeviceServiceImpl();
+        UserService userService = new UserServiceImpl(PixivForwardApplication.URL, PixivForwardApplication.USER_NAME, PixivForwardApplication.USER_PASSWORD);
 
         // 判定设备合法性
-        if (deviceService.verifyDevice(deviceService.getDeviceByIp(IpUtil.getIpv4Address(request)))) {
+        if (userService.confirmKey(key)) {
             // 获取图片信息
             byte[] imageData;
             try {
