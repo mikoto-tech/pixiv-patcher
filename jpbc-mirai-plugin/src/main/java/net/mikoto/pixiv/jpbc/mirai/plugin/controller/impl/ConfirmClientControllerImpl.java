@@ -13,7 +13,6 @@ import java.util.Map;
  * @date 2021/11/14 4:05
  */
 public class ConfirmClientControllerImpl extends ConfirmClientController {
-    private final String GET_KEY = "key";
     private final AbstractHttpExchangeView httpExchangeView;
 
     public ConfirmClientControllerImpl(AbstractHttpExchangeView httpExchangeView) {
@@ -29,7 +28,7 @@ public class ConfirmClientControllerImpl extends ConfirmClientController {
      */
     @Override
     protected void updateConfirmClient(HttpExchange httpExchange, Map<String, String> fromData) throws IOException {
-        String key = fromData.get(GET_KEY);
+        String key = fromData.get("key");
 
         if (key != null) {
             Boolean result = ClientManager.getInstance().confirmClient(key);
