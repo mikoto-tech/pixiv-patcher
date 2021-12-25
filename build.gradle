@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.0"
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+apply plugin: "com.github.johnrengelman.shadow"
+
+shadowJar {
+    manifest {
+        attributes(
+                'Main-Class': 'net.mikoto.pixiv.Main'
+        )
+    }
+}
+
+group 'net.mikoto.pixiv'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation 'commons-io:commons-io:2.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+    implementation 'com.alibaba:fastjson:1.2.79'
+    implementation 'net.mikoto:database-api:1.0.0'
+    implementation 'net.mikoto:http-api:1.0.0'
+    implementation 'com.google.guava:guava:31.0.1-jre'
+}
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
