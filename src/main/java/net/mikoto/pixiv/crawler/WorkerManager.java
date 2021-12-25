@@ -1,12 +1,9 @@
 package net.mikoto.pixiv.crawler;
 
+import net.mikoto.log.Logger;
 import net.mikoto.pixiv.Main;
 import net.mikoto.pixiv.controller.Observer;
-import net.mikoto.pixiv.dao.PixivDataDao;
-import net.mikoto.pixiv.log.Log;
-import net.mikoto.pixiv.pojo.PixivData;
 import net.mikoto.pixiv.pojo.Worker;
-import net.mikoto.pixiv.service.PixivDataService;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -29,7 +26,7 @@ public class WorkerManager {
     private final Integer stop;
     private final Integer workerCount;
     private final Map<Integer, Worker> workerMap = new HashMap<>();
-    private Log logger;
+    private Logger logger;
     private Observer observer;
 
     /**
@@ -70,16 +67,14 @@ public class WorkerManager {
             observer.update(worker);
             worker.setRunnable(() -> {
                 do {
-                    PixivData pixivData = PixivDataService.getInstance().crawlPixivDataById(PixivDataService.getInstance().getPixivDataForwardServer(), worker.getNow());
-                    if (pixivData != null) {
-                        try {
-                            PixivDataDao.getInstance().insertPixivData(pixivData);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
+                    try {
+                        Main.PIXIV_ENGINE.getPixivDataService().getPixivDataById(worker.getNow(), Main.PIXIV_ENGINE.getPixivDataDao());
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (NullPointerException e) {
                         logger.log("Failed to get data(id:" + worker.getNow() + ")");
                     }
+
                     worker.setNow(worker.getNow() + 1);
                     observer.update(worker);
                 } while (worker.getNow() <= worker.getStop());
@@ -94,7 +89,7 @@ public class WorkerManager {
         return workerMap;
     }
 
-    public void setLogger(Log logger) {
+    public void setLogger(Logger logger) {
         this.logger = logger;
     }
 

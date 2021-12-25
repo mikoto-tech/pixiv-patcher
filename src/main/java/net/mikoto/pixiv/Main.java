@@ -1,16 +1,18 @@
 package net.mikoto.pixiv;
 
 import net.mikoto.httpserver.Httpserver;
+import net.mikoto.log.Logger;
 import net.mikoto.pixiv.controller.CrawlCountControllerObserver;
 import net.mikoto.pixiv.crawler.MainCrawler;
 import net.mikoto.pixiv.crawler.WorkerManager;
-import net.mikoto.pixiv.dao.PixivDataDao;
-import net.mikoto.pixiv.log.Log;
-import net.mikoto.pixiv.log.impl.ConsoleTimeFormatLog;
-import net.mikoto.pixiv.service.PixivDataService;
+import net.mikoto.pixiv.engine.PixivEngine;
+import net.mikoto.pixiv.engine.logger.impl.ConsoleTimeFormatLogger;
+import net.mikoto.pixiv.engine.pojo.Config;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -28,7 +30,8 @@ public class Main {
     public static final String PACKAGE = "net.mikoto.pixiv";
     public static final Integer HTTP_API_PORT = 2465;
     public static final Properties PROPERTIES = new Properties();
-    private static final Log LOGGER = new ConsoleTimeFormatLog();
+    private static final Logger LOGGER = new ConsoleTimeFormatLogger();
+    public static PixivEngine PIXIV_ENGINE;
 
 
     public static void main(String[] args) {
@@ -62,12 +65,19 @@ public class Main {
                 .start();
         LOGGER.log("Httpserver service start on localhost:" + HTTP_API_PORT + " successful");
 
-        // 配置Dao
-        PixivDataDao.getInstance().setLogger(LOGGER);
-        LOGGER.log("Database connectivity load successful");
+        // 配置config
+        Config config = new Config();
+        config.setLogger(LOGGER);
+        config.setKey(PROPERTIES.getProperty("KEY"));
+        config.setUserPassword(PROPERTIES.getProperty("PASSWORD"));
+        config.setUserName(PROPERTIES.getProperty("USERNAME"));
+        config.setJpbcUrl(PROPERTIES.getProperty("URL"));
+        config.setPixivDataForwardServer((ArrayList<String>) Arrays.stream(PROPERTIES.getProperty("DATA_FORWARD_SERVER").split(";")).toList());
 
-        // 配置Log
-        PixivDataService.getInstance().setLogger(LOGGER);
+        // 配置Dao
+        PIXIV_ENGINE = new PixivEngine(config);
+
+
         MainCrawler.getInstance().setLogger(LOGGER);
         WorkerManager.getInstance().setLogger(LOGGER);
         WorkerManager.getInstance().setObserver(crawlCountControllerObserver);
