@@ -2,6 +2,7 @@ package net.mikoto.pixiv.crawler;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.mikoto.log.Logger;
+import net.mikoto.pixiv.Main;
 import net.mikoto.pixiv.pojo.Worker;
 
 import java.util.Map;
@@ -22,7 +23,7 @@ public class MainCrawler {
     /**
      * 线程池
      */
-    private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(10, 20, 1, TimeUnit.HOURS, new LinkedBlockingDeque<Runnable>(), new ThreadFactoryBuilder().setNameFormat("mikoto-pixiv-worker-%d").build());
+    private final ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(Integer.parseInt(Main.PROPERTIES.getProperty("WORKER_COUNT")), Integer.parseInt(Main.PROPERTIES.getProperty("WORKER_COUNT")), 1, TimeUnit.HOURS, new LinkedBlockingDeque<>(), new ThreadFactoryBuilder().setNameFormat("mikoto-pixiv-worker-%d").build());
 
     private boolean startFlag = false;
     private Logger logger;

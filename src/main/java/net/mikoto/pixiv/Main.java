@@ -72,7 +72,7 @@ public class Main {
         config.setUserPassword(PROPERTIES.getProperty("PASSWORD"));
         config.setUserName(PROPERTIES.getProperty("USERNAME"));
         config.setJpbcUrl(PROPERTIES.getProperty("URL"));
-        config.setPixivDataForwardServer((ArrayList<String>) Arrays.stream(PROPERTIES.getProperty("DATA_FORWARD_SERVER").split(";")).toList());
+        config.setPixivDataForwardServer(new ArrayList<>(Arrays.asList(PROPERTIES.getProperty("DATA_FORWARD_SERVER").split(";"))));
 
         // 配置Dao
         PIXIV_ENGINE = new PixivEngine(config);
