@@ -1,20 +1,22 @@
 package net.mikoto.pixiv;
 
-import net.mikoto.httpserver.Httpserver;
 import net.mikoto.log.Logger;
-import net.mikoto.pixiv.controller.CrawlCountControllerObserver;
-import net.mikoto.pixiv.crawler.MainCrawler;
-import net.mikoto.pixiv.crawler.WorkerManager;
+import net.mikoto.pixiv.crawler.CrawlerManager;
 import net.mikoto.pixiv.engine.PixivEngine;
 import net.mikoto.pixiv.engine.logger.impl.ConsoleTimeFormatLogger;
 import net.mikoto.pixiv.engine.pojo.Config;
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Properties;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+import static net.mikoto.pixiv.util.FileUtil.createDir;
+import static net.mikoto.pixiv.util.FileUtil.createFile;
 
 /**
  * @author mikoto
@@ -24,67 +26,66 @@ public class Main {
     /**
      * 常量
      */
-    public static final String VERSION = "1.0.1";
-    public static final String DESCRIPTION = "Pixiv main project.";
-    public static final String AUTHOR = "mikoto";
-    public static final String PACKAGE = "net.mikoto.pixiv";
-    public static final Integer HTTP_API_PORT = 2465;
     public static final Properties PROPERTIES = new Properties();
     private static final Logger LOGGER = new ConsoleTimeFormatLogger();
     public static PixivEngine PIXIV_ENGINE;
 
 
-    public static void main(String[] args) {
-        // 配置config
-        InputStream in = null;
+    public static void main(String @NotNull [] args) {
         try {
-            in = new FileInputStream("config.properties");
-        } catch (FileNotFoundException e) {
-            File file = new File("config.properties");
-            try {
-                file.createNewFile();
-                FileWriter fileWriter = new FileWriter(file);
-                fileWriter.write(IOUtils.toString(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("config.properties"))));
-                fileWriter.close();
-                in = new FileInputStream("config.properties");
-            } catch (IOException ignored) {
+            // 创建目录
+            createDir("config");
+            createDir("crawler");
+
+            // 配置文件
+            createFile(new File("config\\config.properties"), IOUtils.toString(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("config.properties")), StandardCharsets.UTF_8));
+            PROPERTIES.load(new FileReader("config\\config.properties"));
+
+            // 读取crawler
+            Map<String, Properties> crawlers = new HashMap<>(args.length / 2);
+            for (int i = 0; i < args.length; i++) {
+                if ("-l".equals(args[i])) {
+                    i++;
+                    Properties crawlerProperties = new Properties();
+                    crawlerProperties.load(new FileInputStream("crawler\\" + args[i] + ".crawler"));
+                    crawlerProperties.put("type", "crawler");
+                    crawlers.put(args[i], crawlerProperties);
+                } else if ("-c".equals(args[i])) {
+                    i++;
+                    Properties crawlerProperties = new Properties();
+                    crawlerProperties.load(new FileInputStream("config\\" + args[i] + ".crawler.properties"));
+                    crawlerProperties.put("type", "crawlerProperties");
+                    crawlers.put(args[i], crawlerProperties);
+                } else if ("-t".equals(args[i])) {
+                    createFile(new File("config\\template.crawler.properties"), IOUtils.toString(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("template.crawler.properties")), StandardCharsets.UTF_8));
+                }
             }
-        }
-        try {
-            PROPERTIES.load(in);
-        } catch (IOException e) {
+
+            // 配置config
+            Config config = new Config();
+            config.setLogger(LOGGER);
+            config.setKey(PROPERTIES.getProperty("KEY"));
+            config.setUserPassword(PROPERTIES.getProperty("PASSWORD"));
+            config.setUserName(PROPERTIES.getProperty("USERNAME"));
+            config.setJpbcUrl(PROPERTIES.getProperty("URL"));
+            config.setPixivDataForwardServer(new ArrayList<>(Arrays.asList(PROPERTIES.getProperty("DATA_FORWARD_SERVER").split(";"))));
+
+            // 配置PixivEngine
+            PIXIV_ENGINE = new PixivEngine(config);
+            LOGGER.log("Worker manager load successful");
+
+            // 加载crawler
+            CrawlerManager.getInstance().loadCrawlers(crawlers, LOGGER);
+
+            // 启动Crawler
+            CrawlerManager.getInstance().startAll();
+
+            while (true) {
+                Thread.sleep(5000);
+                CrawlerManager.getInstance().saveAll();
+            }
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-
-        // 创建crawler
-        CrawlCountControllerObserver crawlCountControllerObserver = new CrawlCountControllerObserver();
-
-        // 启动http服务器
-        Httpserver.setPort(HTTP_API_PORT)
-                .createContext("/crawlCount", crawlCountControllerObserver)
-                .start();
-        LOGGER.log("Httpserver service start on localhost:" + HTTP_API_PORT + " successful");
-
-        // 配置config
-        Config config = new Config();
-        config.setLogger(LOGGER);
-        config.setKey(PROPERTIES.getProperty("KEY"));
-        config.setUserPassword(PROPERTIES.getProperty("PASSWORD"));
-        config.setUserName(PROPERTIES.getProperty("USERNAME"));
-        config.setJpbcUrl(PROPERTIES.getProperty("URL"));
-        config.setPixivDataForwardServer(new ArrayList<>(Arrays.asList(PROPERTIES.getProperty("DATA_FORWARD_SERVER").split(";"))));
-
-        // 配置Dao
-        PIXIV_ENGINE = new PixivEngine(config);
-
-
-        MainCrawler.getInstance().setLogger(LOGGER);
-        WorkerManager.getInstance().setLogger(LOGGER);
-        WorkerManager.getInstance().setObserver(crawlCountControllerObserver);
-        LOGGER.log("Worker manager load successful");
-
-        // 配置Crawler
-        MainCrawler.getInstance().startCrawler(WorkerManager.getInstance().initWorker());
-        LOGGER.log("START CRAWLER");
     }
 }

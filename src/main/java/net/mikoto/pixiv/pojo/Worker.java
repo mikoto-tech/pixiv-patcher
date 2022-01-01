@@ -10,6 +10,7 @@ public class Worker {
     private Integer stop;
     private Integer now;
     private Runnable runnable;
+    private String server;
 
     public Integer getWorkerId() {
         return workerId;
@@ -49,5 +50,13 @@ public class Worker {
 
     public void setRunnable(Runnable runnable) {
         this.runnable = runnable;
+    }
+
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
     }
 }
