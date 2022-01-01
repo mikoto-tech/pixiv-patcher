@@ -12,7 +12,7 @@ shadowJar {
 }
 
 group 'net.mikoto.pixiv'
-version '1.0.0'
+version '1.0.2'
 
 repositories {
     mavenCentral()
@@ -22,7 +22,7 @@ repositories {
 dependencies {
     implementation 'net.mikoto:http-api:1.0.0'
     implementation 'commons-io:commons-io:2.11.0'
-    implementation 'net.mikoto.pixiv:pixiv-engine:1.0.0'
+    implementation 'net.mikoto.pixiv:pixiv-engine:1.0.1'
     implementation 'com.google.guava:guava:31.0.1-jre'
 }
 sourceCompatibility = JavaVersion.VERSION_16
