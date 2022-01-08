@@ -43,7 +43,7 @@ public class CrawlerManager {
     public void saveAll() {
         for (Crawler crawler :
                 crawlerMap.values()) {
-            StringBuffer stringBuffer = new StringBuffer();
+            StringBuilder stringBuffer = new StringBuilder();
             stringBuffer
                     .append("WORKER_COUNT=")
                     .append(crawler.getWorkerMap().size())
@@ -73,7 +73,7 @@ public class CrawlerManager {
                         .append("\n");
             }
             try {
-                writeFile(new File("crawler\\" + crawler.getCrawlerName() + ".crawler"), stringBuffer.toString());
+                writeFile(new File("crawler/" + crawler.getCrawlerName() + ".crawler"), stringBuffer.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -38,8 +38,8 @@ public class Main {
             createDir("crawler");
 
             // 配置文件
-            createFile(new File("config\\config.properties"), IOUtils.toString(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("config.properties")), StandardCharsets.UTF_8));
-            PROPERTIES.load(new FileReader("config\\config.properties"));
+            createFile(new File("config/config.properties"), IOUtils.toString(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("config.properties")), StandardCharsets.UTF_8));
+            PROPERTIES.load(new FileReader("config/config.properties"));
 
             // 读取crawler
             Map<String, Properties> crawlers = new HashMap<>(args.length / 2);
@@ -47,17 +47,17 @@ public class Main {
                 if ("-l".equals(args[i])) {
                     i++;
                     Properties crawlerProperties = new Properties();
-                    crawlerProperties.load(new FileInputStream("crawler\\" + args[i] + ".crawler"));
+                    crawlerProperties.load(new FileInputStream("crawler/" + args[i] + ".crawler"));
                     crawlerProperties.put("type", "crawler");
                     crawlers.put(args[i], crawlerProperties);
                 } else if ("-c".equals(args[i])) {
                     i++;
                     Properties crawlerProperties = new Properties();
-                    crawlerProperties.load(new FileInputStream("config\\" + args[i] + ".crawler.properties"));
+                    crawlerProperties.load(new FileInputStream("config/" + args[i] + ".crawler.properties"));
                     crawlerProperties.put("type", "crawlerProperties");
                     crawlers.put(args[i], crawlerProperties);
                 } else if ("-t".equals(args[i])) {
-                    createFile(new File("config\\template.crawler.properties"), IOUtils.toString(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("template.crawler.properties")), StandardCharsets.UTF_8));
+                    createFile(new File("config/template.crawler.properties"), IOUtils.toString(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream("template.crawler.properties")), StandardCharsets.UTF_8));
                 }
             }
 

@@ -5,7 +5,6 @@ import net.mikoto.log.Logger;
 import net.mikoto.pixiv.Main;
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -68,9 +67,8 @@ public class Crawler {
             do {
                 try {
                     Main.PIXIV_ENGINE.getPixivDataService().getPixivDataById(worker.getServer(), worker.getNow(), Main.PIXIV_ENGINE.getPixivDataDao());
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                } catch (NullPointerException ignored) {
+                } catch (Exception e) {
+                    logger.log("An error happens to artwork:" + worker.getNow() + ".");
                 }
                 worker.setNow(worker.getNow() + 1);
             } while (worker.getNow() <= worker.getStop());
