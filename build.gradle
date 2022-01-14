@@ -22,7 +22,6 @@ repositories {
 dependencies {
     implementation 'commons-io:commons-io:2.11.0'
     implementation 'net.mikoto.pixiv:pixiv-engine:1.0.4'
-    implementation 'net.mikoto:log-api:1.0.0'
     implementation 'com.google.guava:guava:31.0.1-jre'
     implementation 'org.jetbrains:annotations:22.0.0'
 }

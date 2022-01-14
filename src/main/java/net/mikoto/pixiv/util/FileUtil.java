@@ -11,6 +11,11 @@ import java.io.IOException;
  * @date 2022/1/2 1:33
  */
 public class FileUtil {
+    /**
+     * Create a new dir or don't do anything.
+     *
+     * @param dirName The name of the dir.
+     */
     public static void createDir(@NotNull String dirName) {
         File dir = new File(dirName);
         if (!dir.exists()) {
@@ -20,6 +25,13 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Create a new file of don't do anything.
+     *
+     * @param file  The path of the file.
+     * @param input The data in the file.
+     * @throws IOException An error.
+     */
     public static void createFile(@NotNull File file, @NotNull String input) throws IOException {
         if (!file.exists()) {
             if (file.createNewFile()) {
@@ -32,6 +44,13 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Write data into the file.
+     *
+     * @param file  The path of the file.
+     * @param input The data in the file.
+     * @throws IOException An error.
+     */
     public static void writeFile(@NotNull File file, @NotNull String input) throws IOException {
         if (!file.exists()) {
             if (file.createNewFile()) {

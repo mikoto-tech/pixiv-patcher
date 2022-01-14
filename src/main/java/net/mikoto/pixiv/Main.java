@@ -24,13 +24,17 @@ import static net.mikoto.pixiv.util.FileUtil.createFile;
  */
 public class Main {
     /**
-     * 常量
+     * Constants.
      */
     public static final Properties PROPERTIES = new Properties();
     private static final Logger LOGGER = new ConsoleTimeFormatLogger();
     public static PixivEngine PIXIV_ENGINE;
 
-
+    /**
+     * Pixiv main method.
+     *
+     * @param args Arguments.
+     */
     public static void main(String @NotNull [] args) {
         try {
             // 创建目录

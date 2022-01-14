@@ -18,13 +18,15 @@ import static net.mikoto.pixiv.util.FileUtil.writeFile;
  * @date 2022/1/2 1:00
  */
 public class CrawlerManager {
+    /**
+     * Singleton.
+     */
     private static final CrawlerManager INSTANCE = new CrawlerManager();
 
+    /**
+     * Crawlers.
+     */
     private final Map<String, Crawler> crawlerMap = new HashMap<>();
-
-    public static CrawlerManager getInstance() {
-        return INSTANCE;
-    }
 
     public void loadCrawlers(@NotNull Map<String, Properties> crawlers, Logger logger) {
         for (Map.Entry<String, Properties> crawler :
@@ -33,6 +35,18 @@ public class CrawlerManager {
         }
     }
 
+    /**
+     * Get the crawlerManager object.
+     *
+     * @return A crawlerManager object.
+     */
+    public static CrawlerManager getInstance() {
+        return INSTANCE;
+    }
+
+    /**
+     * Start all the crawlers.
+     */
     public void startAll() {
         for (Crawler crawler :
                 crawlerMap.values()) {
@@ -40,6 +54,9 @@ public class CrawlerManager {
         }
     }
 
+    /**
+     * Save the state of crawlers.
+     */
     public void saveAll() {
         for (Crawler crawler :
                 crawlerMap.values()) {
@@ -78,9 +95,5 @@ public class CrawlerManager {
                 e.printStackTrace();
             }
         }
-    }
-
-    public Map<String, Crawler> getCrawlerMap() {
-        return crawlerMap;
     }
 }
