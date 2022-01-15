@@ -6,82 +6,96 @@ Mikoto-Pixiv 是一个使用Java语言编写，能够在全平台下运行的，
 
 《魔法禁书目录》及《科学超电磁炮》中人物: 御坂**美琴**(みさか **みこと**) Misaka **Mikoto**
 
-## 配置
+## 1 pixiv-main
 
-### 1 database
+请在 [release](https://github.com/mikoto2464/pixiv-main/releases) 下载
 
-#### 1.1 pixiv-web-database
+启动参数:
+
+```
+-t 生成模板配置文件
+-l <crawlerName> 从crawler目录下的<crawlerName>.crawler加载crawler
+-c <crawlerName> 从config目录下的<crawlerName>.crawler.properties新建crawler
+```
+
+### 2 database
+
+#### 2.1 pixiv-web-database
 
 此数据库并不会存储任何的pixiv作品数据 此数据库将会存储您的设备验证信息 web端账号信息等
 
 我们目前只支持使用Mysql进行部署
 
-数据表模板请到 [release](https://github.com/mikoto2464/pixiv/releases) 下载
+数据表模板:
 
-#### 1.2 pixiv-database
+```mysql
+create table pixiv_web_data.user_data
+(
+    pk_id         bigint unsigned auto_increment
+        primary key,
+    user_name     varchar(20)  not null,
+    user_password varchar(64)  not null,
+    user_salt     varchar(10)  not null,
+    user_key      varchar(64)  not null,
+    profile_url   varchar(512) null,
+    create_time   datetime     not null,
+    update_time   datetime     not null,
+    constraint user_data_pk_id_uindex
+        unique (pk_id),
+    constraint user_data_user_key_uindex
+        unique (user_key),
+    constraint user_data_user_name_uindex
+        unique (user_name)
+);
+```
+
+#### 2.2 pixiv-database
 
 此数据库有且只有一个用途,便是存储所有的pixiv数据
 
-同样的 我们只支持使用Mysql部署 在 [release](https://github.com/mikoto2464/pixiv/releases) 下载数据表模板
+同样的 我们只支持使用Mysql部署
 
-### 2 pixiv-forward
+数据库模板:
 
-为了规避pixiv的反爬虫机制,同时为了应对中国特殊的网络环境,我们使用pixiv-forward进行pixiv数据的转发
-
-我们不建议您将pixiv-forward项目部署在中国大陆地区(懂得都懂)
-
-部署pixiv-forward的方法也很简单,您只需要在 [release](https://github.com/mikoto2464/pixiv/releases) 页面下载此项目的jar包 并将其下载到您的目标服务器 接着执行以下命令
-
-```bash
-nohup java -jar pixiv-forward-1.1.4.jar [ip] [port] [userName] [password] > pixiv-forward.log 2>&1 &
+```mysql
+create table pixiv_data.bookmark_0_1000
+(
+    pk_artwork_id       bigint         not null
+        primary key,
+    artwork_title       varchar(32)    null,
+    author_id           bigint         not null,
+    author_name         varchar(100)   not null,
+    description         varchar(10000) null,
+    tags                varchar(309)   null,
+    illust_url_mini     varchar(100)   null,
+    illust_url_thumb    varchar(100)   null,
+    illust_url_small    varchar(100)   null,
+    illust_url_regular  varchar(100)   null,
+    illust_url_original varchar(100)   null,
+    page_count          int            null,
+    bookmark_count      int            null,
+    like_count          int            null,
+    view_count          int            null,
+    grading             tinyint        not null,
+    update_date         datetime       null,
+    create_date         datetime       null,
+    crawl_date          datetime       null,
+    constraint bookmark_under_1000_pk_artwork_id_uindex
+        unique (pk_artwork_id)
+);
 ```
 
-上面命令中的
+### 3 pixiv-forward
 
-```bash
-[ip] [port] [userName] [password]
-```
+请见仓库 [pixiv-forward](https://github.com/mikoto2464/pixiv-forward)
 
-分别为您的pixiv-web-database的 ip 端口 用户名 密码 请正确填写
+### 4 pixiv-displayer
 
-我们为pixiv-forward免费提供了两个转发服务器:
+请见仓库 [pixiv-displayer](https://github.com/mikoto2464/pixiv-displayer)
 
-```
-https://pixiv-forward-1.mikoto-tech.cc
-https://pixiv-forward-2.mikoto-tech.cc
-```
+### 5 扩展
 
-并且开放测试key: 1fc499f4ef758ad328505f6747d39198c9373cb1dfe893f21300f0eeb7a3f4c4
-
-### 3 pixiv-main
-
-请在 [release](https://github.com/mikoto2464/pixiv/releases) 下载
-
-```bash
-nohup java -jar pixiv-main-1.0.0.jar > pixiv-forward.log 2>&1 &
-```
-
-记得修改config
-
-目前我们在私人服务器中部署了此项目
-
-可通过一下http api查看目前爬取情况
-
-```
-http://104.160.18.141:58986/crawlCount
-```
-
-(使用frp转发)
-
-感谢好友Beita233提供的另一台服务器：
-
-```
-http://158.101.92.116:2465/crawlCount
-```
-
-### 4 扩展
-
-#### 4.1 JPBC(Java Pixiv Bot Connectivity)
+#### 5.1 JPBC(Java Pixiv Bot Connectivity)
 
 JPBC基于http协议 使pixiv-main得以向其它通讯软件 提供服务 具体文档请见: [docs](https://jpbc.docs.mikoto.net.cn) (文档还未制作完成)
 
@@ -119,13 +133,3 @@ JPBC基于http协议 使pixiv-main得以向其它通讯软件 提供服务 具�
 - **不鼓励，不支持一切商业使用**
 
 鉴于项目的特殊性，开发团队可能在任何时间**停止更新**或**删除项目**。
-
-## 使用到的开源项目
-
-- [mirai](https://github.com/mamoe/mirai)
-- [fastjson](https://github.com/alibaba/fastjson)
-- [okhttp](https://github.com/square/okhttp)
-- [tomcat](https://github.com/apache/tomcat)
-- [spring-boot](https://github.com/spring-projects/spring-boot)
-
-可能还有没提到的项目 欢迎补充
