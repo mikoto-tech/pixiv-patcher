@@ -93,6 +93,14 @@ create table pixiv_data.bookmark_0_1000
 
 请见仓库 [pixiv-displayer](https://github.com/mikoto2464/pixiv-displayer)
 
+### 5 pixiv-engine
+
+请见仓库 [pixiv-engine](https://github.com/mikoto2464/pixiv-engine)
+
+### 5 pixiv-api
+
+请见仓库 [pixiv-api](https://github.com/mikoto2464/pixiv-api)
+
 ### 5 扩展
 
 #### 5.1 JPBC(Java Pixiv Bot Connectivity)
