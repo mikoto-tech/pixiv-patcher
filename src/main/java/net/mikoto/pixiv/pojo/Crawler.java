@@ -107,6 +107,7 @@ public class Crawler {
             Thread.sleep(1000);
             crawl(server, artworkId);
         }
+        Thread.sleep(1000);
     }
 
     /**
