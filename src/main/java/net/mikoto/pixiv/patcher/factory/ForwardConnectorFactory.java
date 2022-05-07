@@ -5,8 +5,8 @@ import net.mikoto.pixiv.forward.connector.ForwardConnector;
 
 import java.io.IOException;
 
-import static net.mikoto.pixiv.patcher.constant.Properties.FORWARD_SERVER;
-import static net.mikoto.pixiv.patcher.constant.Properties.MAIN_PROPERTIES;
+import static net.mikoto.pixiv.patcher.constant.Constant.FORWARD_SERVER;
+import static net.mikoto.pixiv.patcher.constant.Constant.MAIN_PROPERTIES;
 
 /**
  * @author mikoto

@@ -10,9 +10,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import static net.mikoto.pixiv.patcher.constant.Properties.*;
-import static net.mikoto.pixiv.patcher.util.FileUtil.createDir;
-import static net.mikoto.pixiv.patcher.util.FileUtil.createFile;
+import static net.mikoto.pixiv.api.util.FileUtil.createDir;
+import static net.mikoto.pixiv.api.util.FileUtil.createFile;
+import static net.mikoto.pixiv.patcher.constant.Constant.*;
 
 /**
  * @author mikoto
@@ -26,7 +26,7 @@ public class PixivPatcherApplication {
         MAIN_PROPERTIES.load(new FileReader("config/config.properties"));
 
         if (MAIN_PROPERTIES.getProperty(IS_SAVE_ARTWORK).equals(TRUE)) {
-            createDir(MAIN_PROPERTIES.getProperty(ARTWORK_PATH));
+            createDir(MAIN_PROPERTIES.getProperty(LOCAL_PATH));
         }
 
         if (MAIN_PROPERTIES.getProperty(SAVE_ARTWORK_TYPE).equals(ALL)) {

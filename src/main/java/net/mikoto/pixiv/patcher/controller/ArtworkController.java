@@ -1,6 +1,6 @@
 package net.mikoto.pixiv.patcher.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import net.mikoto.pixiv.api.pojo.Artwork;
 import net.mikoto.pixiv.forward.connector.exception.GetArtworkInformationException;
 import net.mikoto.pixiv.forward.connector.exception.GetImageException;
@@ -48,22 +48,22 @@ public class ArtworkController {
         Artwork artwork = null;
         try {
             artwork = artworkService.patchArtwork(artworkId);
-            outputJsonObject.put("success", true);
+            outputJsonObject.fluentPut("success", true);
         } catch (GetArtworkInformationException e) {
-            outputJsonObject.put("success", false);
-            outputJsonObject.put("message", "There are some wrong in getting artwork information.");
-            outputJsonObject.put("rawMessage", e.getMessage());
+            outputJsonObject.fluentPut("success", false);
+            outputJsonObject.fluentPut("message", "There are some wrong in getting artwork information.");
+            outputJsonObject.fluentPut("rawMessage", e.getMessage());
         } catch (GetImageException e) {
-            outputJsonObject.put("success", false);
-            outputJsonObject.put("message", "There are some wrong in getting image.");
-            outputJsonObject.put("rawMessage", e.getMessage());
+            outputJsonObject.fluentPut("success", false);
+            outputJsonObject.fluentPut("message", "There are some wrong in getting image.");
+            outputJsonObject.fluentPut("rawMessage", e.getMessage());
         } catch (WrongSignException e) {
-            outputJsonObject.put("success", false);
-            outputJsonObject.put("message", "A wrong sign! Please verify your forward.");
-            outputJsonObject.put("rawMessage", e.getMessage());
+            outputJsonObject.fluentPut("success", false);
+            outputJsonObject.fluentPut("message", "A wrong sign! Please verify your forward.");
+            outputJsonObject.fluentPut("rawMessage", e.getMessage());
         }
 
-        outputJsonObject.put("body", artwork);
+        outputJsonObject.fluentPut("body", artwork);
         return outputJsonObject;
     }
 }

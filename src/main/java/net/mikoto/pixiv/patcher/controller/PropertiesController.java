@@ -1,6 +1,6 @@
 package net.mikoto.pixiv.patcher.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import net.mikoto.pixiv.api.pojo.ForwardServer;
 import net.mikoto.pixiv.patcher.service.ArtworkService;
 import org.jetbrains.annotations.NotNull;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static net.mikoto.pixiv.patcher.constant.Properties.FORWARD_SERVER;
-import static net.mikoto.pixiv.patcher.constant.Properties.MAIN_PROPERTIES;
+import static net.mikoto.pixiv.patcher.constant.Constant.FORWARD_SERVER;
+import static net.mikoto.pixiv.patcher.constant.Constant.MAIN_PROPERTIES;
 
 /**
  * @author mikoto
@@ -45,12 +45,12 @@ public class PropertiesController {
 
         try {
             artworkService.addForwardServer(new ForwardServer(address, weight, key));
-            outputJsonObject.put("success", true);
-            outputJsonObject.put("message", "");
+            outputJsonObject.fluentPut("success", true);
+            outputJsonObject.fluentPut("message", "");
         } catch (IOException | NoSuchMethodException e) {
-            outputJsonObject.put("success", false);
-            outputJsonObject.put("message", "There are some wrong in adding forward server.");
-            outputJsonObject.put("rawMessage", e.getMessage());
+            outputJsonObject.fluentPut("success", false);
+            outputJsonObject.fluentPut("message", "There are some wrong in adding forward server.");
+            outputJsonObject.fluentPut("rawMessage", e.getMessage());
         }
 
         return outputJsonObject;
