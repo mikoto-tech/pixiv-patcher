@@ -1,16 +1,18 @@
 package net.mikoto.pixiv.patcher;
 
-import net.mikoto.pixiv.api.connector.Connector;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.mikoto.pixiv.api.model.ForwardServer;
 import net.mikoto.pixiv.database.connector.DatabaseConnector;
 import net.mikoto.pixiv.forward.connector.ForwardConnector;
 import net.mikoto.pixiv.forward.connector.exception.GetArtworkInformationException;
 import net.mikoto.pixiv.forward.connector.exception.GetImageException;
-import net.mikoto.pixiv.forward.connector.exception.WrongSignException;
 import net.mikoto.pixiv.patcher.exception.AlreadyStartedException;
-import net.mikoto.pixiv.patcher.manager.ConfigManager;
 import net.mikoto.pixiv.patcher.model.ArtworkCache;
 import net.mikoto.pixiv.patcher.service.ArtworkService;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -18,43 +20,97 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-
-import static net.mikoto.pixiv.patcher.manager.ConfigManager.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mikoto
  * @date 2022/5/8 3:01
  */
+@Component("patcher")
 public class Patcher {
+    @Qualifier("artworkService")
     private final ArtworkService artworkService;
-    private Properties properties;
-    private ForwardConnector forwardConnector;
+    @Qualifier("databaseConnector")
     private final DatabaseConnector databaseConnector;
+    @Qualifier("forwardConnector")
+    private ForwardConnector forwardConnector;
     private boolean start = false;
-    private int beginningArtworkId;
-    private int targetArtworkId;
-    private ExecutorService executorService;
-    private int threadCount;
+    private boolean init = false;
+    private ThreadPoolExecutor threadPoolExecutor;
     private List<Queue<Integer>> artworkTasks;
 
-    public Patcher(@NotNull Properties properties, ArtworkService artworkService, Connector forwardConnector, Connector databaseConnector) {
-        this.properties = properties;
+    /**
+     * Properties
+     */
+    @Value("${mikoto.pixiv.patcher.threadCount}")
+    private int threadCount;
+    @Value("${mikoto.pixiv.patcher.beginningArtworkId}")
+    private int beginningArtworkId;
+    @Value("${mikoto.pixiv.patcher.targetArtworkId}")
+    private int targetArtworkId;
+    @Value("${mikoto.pixiv.patcher.cacheSize}")
+    private int cacheSize;
+    @Value("${mikoto.pixiv.patcher.corePoolSize}")
+    private int corePoolSize;
+    @Value("${mikoto.pixiv.patcher.maximumPoolSize}")
+    private int maximumPoolSize;
+    @Value("${mikoto.pixiv.patcher.keepAliveTime}")
+    private int keepAliveTime;
+    @Value("${mikoto.pixiv.patcher.timeUnit}")
+    private TimeUnit timeUnit;
+    @Value("${mikoto.pixiv.patcher.nameFormat}")
+    private String nameFormat;
+    @Value("${mikoto.pixiv.patcher.forwardServers}")
+    private String forwardServers;
+    @Value("${mikoto.pixiv.patcher.database.address}")
+    private String databaseAddress;
+    @Value("${mikoto.pixiv.patcher.database.key}")
+    private String databaseKey;
+
+    @Autowired
+    public Patcher(ArtworkService artworkService, ForwardConnector forwardConnector, DatabaseConnector databaseConnector) {
         this.artworkService = artworkService;
-        this.forwardConnector = (ForwardConnector) forwardConnector;
-        this.databaseConnector = (DatabaseConnector) databaseConnector;
-        this.beginningArtworkId = Integer.parseInt(properties.getProperty(ConfigManager.BEGINNING_ARTWORK_ID));
-        this.targetArtworkId = Integer.parseInt(properties.getProperty(ConfigManager.TARGET_ARTWORK_ID));
-        this.threadCount = Integer.parseInt(properties.getProperty(ConfigManager.THREAD_COUNT));
+        this.forwardConnector = forwardConnector;
+        this.databaseConnector = databaseConnector;
     }
 
     public void stop() {
         start = false;
     }
 
+    public void init() {
+        if (!init) {
+            threadPoolExecutor = new ThreadPoolExecutor(
+                    corePoolSize,
+                    maximumPoolSize,
+                    keepAliveTime,
+                    timeUnit,
+                    new LinkedBlockingQueue<>(),
+                    new ThreadFactoryBuilder().setNameFormat(nameFormat).build(),
+                    new ThreadPoolExecutor.AbortPolicy()
+            );
+
+            for (String forwardServer :
+                    forwardServers.split(";")) {
+                String[] forwardServerConfig = forwardServer.split(",");
+                forwardConnector.addForwardServer(new ForwardServer(forwardServerConfig[0], Integer.parseInt(forwardServerConfig[1]), forwardServerConfig[2]));
+            }
+
+            databaseConnector.setDefaultDatabaseAddress(databaseAddress);
+            databaseConnector.setDefaultDatabaseKey(databaseKey);
+
+            init = true;
+        }
+    }
+
     public void start() throws AlreadyStartedException {
-        if (!start) {
+        if (!start && init) {
             start = true;
 
             // init thread.
@@ -90,8 +146,8 @@ public class Patcher {
             // Start thread
             for (Queue<Integer> queue :
                     artworkTasks) {
-                executorService.execute(() -> {
-                    ArtworkCache artworkCache = new ArtworkCache(Integer.parseInt(properties.getProperty(CACHE_SIZE)));
+                threadPoolExecutor.execute(() -> {
+                    ArtworkCache artworkCache = new ArtworkCache(cacheSize);
                     for (Integer artworkId :
                             queue) {
                         if (!start) {
@@ -100,7 +156,7 @@ public class Patcher {
 
                         if (artworkCache.isFull()) {
                             try {
-                                databaseConnector.insertArtworks(properties.getProperty(DATABASE_KEY), properties.getProperty(DATABASE_ADDRESS), artworkCache.getArtworks());
+                                databaseConnector.insertArtworks(null, null, artworkCache.getArtworks());
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             } finally {
@@ -110,7 +166,7 @@ public class Patcher {
 
                         while (true) {
                             try {
-                                artworkService.patchArtwork(artworkId, artworkCache, forwardConnector, properties);
+                                artworkService.patchArtwork(artworkId, artworkCache, forwardConnector);
                                 Thread.sleep(500);
                                 break;
                             } catch (GetArtworkInformationException e) {
@@ -118,7 +174,7 @@ public class Patcher {
                                     break;
                                 }
                             } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException |
-                                     SignatureException | InvalidKeyException | WrongSignException |
+                                     SignatureException | InvalidKeyException |
                                      InvocationTargetException | NoSuchMethodException | IllegalAccessException |
                                      GetImageException | InterruptedException e) {
                                 e.printStackTrace();
@@ -135,7 +191,7 @@ public class Patcher {
 
                     if (!artworkCache.isEmpty()) {
                         try {
-                            databaseConnector.insertArtworks(properties.getProperty(DATABASE_KEY), properties.getProperty(DATABASE_ADDRESS), artworkCache.getArtworks());
+                            databaseConnector.insertArtworks(null, null, artworkCache.getArtworks());
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         } finally {
@@ -152,18 +208,6 @@ public class Patcher {
 
     public boolean isStart() {
         return start;
-    }
-
-    public Properties getProperties() {
-        return properties;
-    }
-
-    public void setProperties(Properties properties) throws AlreadyStartedException {
-        if (!start) {
-            this.properties = properties;
-        } else {
-            throw new AlreadyStartedException("Patcher has already started.");
-        }
     }
 
     public int getBeginningArtworkId() {
@@ -218,7 +262,7 @@ public class Patcher {
         }
     }
 
-    public void setExecutorService(ExecutorService executorService) {
-        this.executorService = executorService;
+    public ThreadPoolExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
     }
 }
