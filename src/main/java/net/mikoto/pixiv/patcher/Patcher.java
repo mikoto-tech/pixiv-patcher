@@ -6,6 +6,7 @@ import net.mikoto.pixiv.database.connector.DatabaseConnector;
 import net.mikoto.pixiv.forward.connector.ForwardConnector;
 import net.mikoto.pixiv.forward.connector.exception.GetArtworkInformationException;
 import net.mikoto.pixiv.forward.connector.exception.GetImageException;
+import net.mikoto.pixiv.forward.connector.exception.NoSuchArtworkException;
 import net.mikoto.pixiv.patcher.exception.AlreadyStartedException;
 import net.mikoto.pixiv.patcher.model.ArtworkCache;
 import net.mikoto.pixiv.patcher.service.ArtworkService;
@@ -16,10 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -169,17 +166,12 @@ public class Patcher {
                                 artworkService.patchArtwork(artworkId, artworkCache, forwardConnector);
                                 Thread.sleep(500);
                                 break;
-                            } catch (GetArtworkInformationException e) {
-                                if ("Get artwork failed: 該当作品は削除されたか、存在しない作品IDです。".equals(e.getMessage())) {
-                                    break;
-                                }
-                            } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException |
-                                     SignatureException | InvalidKeyException |
-                                     InvocationTargetException | NoSuchMethodException | IllegalAccessException |
-                                     GetImageException | InterruptedException e) {
+                            } catch (NoSuchArtworkException e) {
+                                break;
+                            } catch (GetImageException | GetArtworkInformationException | IOException |
+                                     InterruptedException | NoSuchMethodException | InvocationTargetException |
+                                     IllegalAccessException e) {
                                 e.printStackTrace();
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
                             }
                             try {
                                 Thread.sleep(1000);
@@ -260,9 +252,5 @@ public class Patcher {
         } else {
             throw new AlreadyStartedException("Patcher has already started.");
         }
-    }
-
-    public ThreadPoolExecutor getThreadPoolExecutor() {
-        return threadPoolExecutor;
     }
 }

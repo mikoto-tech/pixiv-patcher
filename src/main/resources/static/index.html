@@ -1,48 +1,81 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE HTML>
+<html lang="zh-cn">
 <head>
-    <title>Mikoto</title>
-    <meta charset="utf-8"/>
-    <meta
-            content="width=device-width, initial-scale=1, user-scalable=no"
-            name="viewport"
-    />
-    <link href="assets/css/main.css" rel="stylesheet"/>
+    <title>Mikoto-Pixiv-Patcher</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.1/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
 </head>
-<body class="is-preload">
-<!-- Header -->
-<header id="header">
-    <h1>Mikoto-Pixiv-Patcher</h1>
-    <p>欢迎来到Mikoto-Pixiv-Patcher</p>
-</header>
+<body style="background: rgb(13, 17, 23); color: rgb(201, 209, 217);">
+<div class="container mt-3">
+    <h1>
+        Mikoto-Pixiv-Patcher
+    </h1>
 
+    <input class="form-control" id="key" name="key" placeholder="key" style="width: 200px" type="password"/>
 
-<p>
-    <a href="console/index.html">Console</a>
-</p>
+    <br>
 
-<!-- Footer -->
-<footer id="footer">
-    <ul class="icons">
-        <li>
-            <a
-                    class="icon brands fa-github"
-                    href="https://github.com/mikoto2464"
-            ><span class="label">GitHub</span></a
-            >
-        </li>
-        <li>
-            <a class="icon fa-envelope" href="mailto:mikoto@ungine.cn"
-            ><span class="label">Email</span></a
-            >
-        </li>
-    </ul>
-    <ul class="copyright">
-        <li>&copy; Mikoto-Tech.</li>
-    </ul>
-</footer>
+    <button class="btn btn-primary" onclick="sendRequest('/api/patcher/init')" type="button">Init</button>
 
-<!-- Scripts -->
-<script src="assets/js/main.js"></script>
+    <button class="btn btn-primary" onclick="sendRequest('/api/patcher/start')" type="button">Start</button>
+
+    <button class="btn btn-primary" onclick="sendRequest('/api/patcher/stop')" type="button">Stop</button>
+</div>
+
+<div class="container mt-3">
+    BeginningArtworkId: <span id="beginningArtworkId"></span><br>
+    TargetArtworkId: <span id="targetArtworkId"></span><br>
+    Threadcount: <span id="threadCount"></span><br>
+    Start: <span id="start"></span><br>
+</div>
+
+<div class="container mt-3">
+    <small>
+        &copy;<a href="https://github.com/mikoto-tech">Mikoto-Tech</a> 2022
+    </small>
+</div>
+
+<script>
+    var getPatcherInfoHttpRequest = new XMLHttpRequest();
+    getPatcherInfoHttpRequest.onreadystatechange = function () {
+        if (
+            getPatcherInfoHttpRequest.readyState == 4 &&
+            getPatcherInfoHttpRequest.status == 200
+        ) {
+            if (getPatcherInfoHttpRequest.responseText != "") {
+                let responseJson = JSON.parse(getPatcherInfoHttpRequest.responseText);
+                document.getElementById("beginningArtworkId").innerText = responseJson["beginningArtworkId"];
+                document.getElementById("targetArtworkId").innerText = responseJson["targetArtworkId"];
+                document.getElementById("threadCount").innerText = responseJson["threadCount"];
+                document.getElementById("start").innerText = responseJson["start"];
+            }
+        }
+    };
+    getPatcherInfoHttpRequest.open("GET", "/api/patcher/get", true);
+    getPatcherInfoHttpRequest.send();
+
+    function sendRequest(url) {
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function () {
+            if (
+                request.readyState == 4 &&
+                request.status == 200
+            ) {
+                if (request.responseText != "") {
+                    let responseJson = JSON.parse(request.responseText);
+                    if (responseJson["success"]) {
+                        alert("Success")
+                    } else {
+                        alert(responseJson["msg"])
+                    }
+                }
+            }
+        };
+        request.open("GET", url + "?key=" + document.getElementById("key").value, true);
+        request.send();
+    }
+</script>
 </body>
 </html>

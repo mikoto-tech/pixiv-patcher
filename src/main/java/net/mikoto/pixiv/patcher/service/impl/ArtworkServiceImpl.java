@@ -3,6 +3,8 @@ package net.mikoto.pixiv.patcher.service.impl;
 import com.alibaba.fastjson2.JSON;
 import net.mikoto.pixiv.api.model.Artwork;
 import net.mikoto.pixiv.forward.connector.ForwardConnector;
+import net.mikoto.pixiv.forward.connector.exception.GetArtworkInformationException;
+import net.mikoto.pixiv.forward.connector.exception.GetImageException;
 import net.mikoto.pixiv.patcher.model.ArtworkCache;
 import net.mikoto.pixiv.patcher.model.Source;
 import net.mikoto.pixiv.patcher.model.Storage;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -44,8 +48,8 @@ public class ArtworkServiceImpl implements ArtworkService {
      * @return An artwork object.
      */
     @Override
-    public Artwork patchArtwork(int artworkId, ArtworkCache artworkCache, @NotNull ForwardConnector forwardConnector) throws Exception {
-        Artwork artwork = forwardConnector.getArtworkById(artworkId);
+    public Artwork patchArtwork(int artworkId, ArtworkCache artworkCache, @NotNull ForwardConnector forwardConnector) throws GetArtworkInformationException, IOException, NoSuchMethodException, GetImageException, InvocationTargetException, IllegalAccessException {
+        Artwork artwork = forwardConnector.getArtworkInformation(artworkId);
 
         if (artwork != null) {
             if (storage.contains(Storage.local)) {
@@ -72,7 +76,7 @@ public class ArtworkServiceImpl implements ArtworkService {
                         fileOutputStream2.close();
                     }
                 }
-            } else if (storage.contains(DATABASE)) {
+            } else if (storage.contains(Storage.database)) {
                 artworkCache.addArtwork(artwork);
             }
         }

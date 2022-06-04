@@ -7,10 +7,7 @@ import net.mikoto.pixiv.forward.connector.exception.GetImageException;
 import net.mikoto.pixiv.patcher.model.ArtworkCache;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author mikoto
@@ -24,16 +21,6 @@ public interface ArtworkService {
      * @param artworkCache     The artwork cache object.
      * @param forwardConnector The forward connector.
      * @return An artwork object.
-     * @throws GetArtworkInformationException An exception.
-     * @throws IOException                    An exception.
-     * @throws InvalidKeyException            An exception.
-     * @throws GetImageException              An exception.
-     * @throws IllegalAccessException         An exception.
-     * @throws InvalidKeyException            An exception.
-     * @throws InvalidKeySpecException        An exception.
-     * @throws NoSuchAlgorithmException       An exception.
-     * @throws NoSuchMethodException          An exception.
-     * @throws SignatureException             An exception.
      */
-    Artwork patchArtwork(int artworkId, ArtworkCache artworkCache, ForwardConnector forwardConnector) throws Exception;
+    Artwork patchArtwork(int artworkId, ArtworkCache artworkCache, ForwardConnector forwardConnector) throws GetArtworkInformationException, IOException, NoSuchMethodException, GetImageException, InvocationTargetException, IllegalAccessException;
 }

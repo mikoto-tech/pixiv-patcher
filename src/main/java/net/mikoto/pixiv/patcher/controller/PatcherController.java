@@ -8,6 +8,7 @@ import net.mikoto.pixiv.patcher.exception.AlreadyStartedException;
 import net.mikoto.pixiv.patcher.service.ArtworkService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +25,8 @@ public class PatcherController {
     private final ArtworkService artworkService;
     @Qualifier("patcher")
     private final Patcher patcher;
+    @Value("${mikoto.pixiv.patcher.key}")
+    private String key;
 
     public PatcherController(ArtworkService artworkService, Patcher patcher) {
         this.artworkService = artworkService;
@@ -34,17 +37,22 @@ public class PatcherController {
     @RequestMapping(
             "/start"
     )
-    public JSONObject startPatcher(@NotNull HttpServletResponse response) {
+    public JSONObject startPatcher(@NotNull HttpServletResponse response, String key) {
         response.setContentType("application/json;charset=UTF-8");
 
         JSONObject jsonObject = new JSONObject();
-        try {
-            patcher.start();
-            jsonObject.fluentPut("success", true);
-            jsonObject.fluentPut("msg", "Start patcher");
-        } catch (AlreadyStartedException e) {
+        if (this.key.equals(key)) {
+            try {
+                patcher.start();
+                jsonObject.fluentPut("success", true);
+                jsonObject.fluentPut("msg", "Start patcher");
+            } catch (AlreadyStartedException e) {
+                jsonObject.fluentPut("success", false);
+                jsonObject.fluentPut("msg", e.getMessage());
+            }
+        } else {
             jsonObject.fluentPut("success", false);
-            jsonObject.fluentPut("msg", e.getMessage());
+            jsonObject.fluentPut("msg", "Wrong key!");
         }
         return jsonObject;
     }
@@ -52,26 +60,35 @@ public class PatcherController {
     @RequestMapping(
             "/stop"
     )
-    public JSONObject stopPatcher(@NotNull HttpServletResponse response) {
+    public JSONObject stopPatcher(@NotNull HttpServletResponse response, String key) {
         response.setContentType("application/json;charset=UTF-8");
 
         JSONObject jsonObject = new JSONObject();
-
-        patcher.stop();
-        jsonObject.fluentPut("success", true);
-        jsonObject.fluentPut("msg", "Stop patcher");
+        if (this.key.equals(key)) {
+            patcher.stop();
+            jsonObject.fluentPut("success", true);
+            jsonObject.fluentPut("msg", "Stop patcher");
+        } else {
+            jsonObject.fluentPut("success", false);
+            jsonObject.fluentPut("msg", "Wrong key!");
+        }
         return jsonObject;
     }
 
     @RequestMapping(
             "/init"
     )
-    public JSONObject initPatcher(@NotNull HttpServletResponse response) {
+    public JSONObject initPatcher(@NotNull HttpServletResponse response, String key) {
         response.setContentType("application/json;charset=UTF-8");
         JSONObject jsonObject = new JSONObject();
-        patcher.init();
-        jsonObject.fluentPut("success", true);
-        jsonObject.fluentPut("msg", "Init patcher");
+        if (this.key.equals(key)) {
+            patcher.init();
+            jsonObject.fluentPut("success", true);
+            jsonObject.fluentPut("msg", "Init patcher");
+        } else {
+            jsonObject.fluentPut("success", false);
+            jsonObject.fluentPut("msg", "Wrong key!");
+        }
         return jsonObject;
     }
 
@@ -82,14 +99,5 @@ public class PatcherController {
         response.setContentType("application/json;charset=UTF-8");
 
         return (JSONObject) JSON.toJSON(patcher);
-    }
-
-    @RequestMapping(
-            "/getThreadPool"
-    )
-    public JSONObject getThreadPool(@NotNull HttpServletResponse response) {
-        response.setContentType("application/json;charset=UTF-8");
-
-        return (JSONObject) JSON.toJSON(patcher.getThreadPoolExecutor());
     }
 }
