@@ -1,11 +1,12 @@
 package net.mikoto.pixiv.patcher.manager.impl;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import net.mikoto.pixiv.patcher.Patcher;
 import net.mikoto.pixiv.patcher.exception.AlreadyStartedException;
 import net.mikoto.pixiv.patcher.manager.ConfigManager;
 import net.mikoto.pixiv.patcher.manager.PatcherManager;
-import net.mikoto.pixiv.patcher.model.Patcher;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -22,8 +23,8 @@ public class PatcherManagerImpl implements PatcherManager {
     private static final Map<String, Patcher> PATCHER_MAP = new ConcurrentHashMap<>();
     private final ExecutorService EXECUTOR_SERVICE;
 
+    @Autowired
     public PatcherManagerImpl(@NotNull ConfigManager configManager) {
-
         Properties properties = configManager.getConfig(ConfigManager.DEFAULT_CONFIG);
 
         EXECUTOR_SERVICE = new ThreadPoolExecutor(

@@ -1,11 +1,14 @@
-package net.mikoto.pixiv.patcher.model;
+package net.mikoto.pixiv.patcher;
 
+import net.mikoto.pixiv.api.connector.Connector;
+import net.mikoto.pixiv.database.connector.DatabaseConnector;
 import net.mikoto.pixiv.forward.connector.ForwardConnector;
 import net.mikoto.pixiv.forward.connector.exception.GetArtworkInformationException;
 import net.mikoto.pixiv.forward.connector.exception.GetImageException;
 import net.mikoto.pixiv.forward.connector.exception.WrongSignException;
 import net.mikoto.pixiv.patcher.exception.AlreadyStartedException;
 import net.mikoto.pixiv.patcher.manager.ConfigManager;
+import net.mikoto.pixiv.patcher.model.ArtworkCache;
 import net.mikoto.pixiv.patcher.service.ArtworkService;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +21,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
+import static net.mikoto.pixiv.patcher.manager.ConfigManager.*;
+
 /**
  * @author mikoto
  * @date 2022/5/8 3:01
@@ -26,6 +31,7 @@ public class Patcher {
     private final ArtworkService artworkService;
     private Properties properties;
     private ForwardConnector forwardConnector;
+    private final DatabaseConnector databaseConnector;
     private boolean start = false;
     private int beginningArtworkId;
     private int targetArtworkId;
@@ -33,11 +39,11 @@ public class Patcher {
     private int threadCount;
     private List<Queue<Integer>> artworkTasks;
 
-    public Patcher(@NotNull Properties properties, ArtworkService artworkService, ForwardConnector forwardConnector) {
+    public Patcher(@NotNull Properties properties, ArtworkService artworkService, Connector forwardConnector, Connector databaseConnector) {
         this.properties = properties;
         this.artworkService = artworkService;
-        this.forwardConnector = forwardConnector;
-
+        this.forwardConnector = (ForwardConnector) forwardConnector;
+        this.databaseConnector = (DatabaseConnector) databaseConnector;
         this.beginningArtworkId = Integer.parseInt(properties.getProperty(ConfigManager.BEGINNING_ARTWORK_ID));
         this.targetArtworkId = Integer.parseInt(properties.getProperty(ConfigManager.TARGET_ARTWORK_ID));
         this.threadCount = Integer.parseInt(properties.getProperty(ConfigManager.THREAD_COUNT));
@@ -85,23 +91,55 @@ public class Patcher {
             for (Queue<Integer> queue :
                     artworkTasks) {
                 executorService.execute(() -> {
+                    ArtworkCache artworkCache = new ArtworkCache(Integer.parseInt(properties.getProperty(CACHE_SIZE)));
                     for (Integer artworkId :
                             queue) {
                         if (!start) {
                             break;
                         }
 
+                        if (artworkCache.isFull()) {
+                            try {
+                                databaseConnector.insertArtworks(properties.getProperty(DATABASE_KEY), properties.getProperty(DATABASE_ADDRESS), artworkCache.getArtworks());
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            } finally {
+                                artworkCache.removeAll();
+                            }
+                        }
+
                         while (true) {
                             try {
-                                artworkService.patchArtwork(artworkId, forwardConnector, properties);
+                                artworkService.patchArtwork(artworkId, artworkCache, forwardConnector, properties);
+                                Thread.sleep(500);
                                 break;
                             } catch (GetArtworkInformationException e) {
                                 if ("Get artwork failed: 該当作品は削除されたか、存在しない作品IDです。".equals(e.getMessage())) {
                                     break;
                                 }
-                            } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException | SignatureException | InvalidKeyException | WrongSignException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | GetImageException e) {
+                            } catch (IOException | InvalidKeySpecException | NoSuchAlgorithmException |
+                                     SignatureException | InvalidKeyException | WrongSignException |
+                                     InvocationTargetException | NoSuchMethodException | IllegalAccessException |
+                                     GetImageException | InterruptedException e) {
                                 e.printStackTrace();
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
                             }
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+
+                    if (!artworkCache.isEmpty()) {
+                        try {
+                            databaseConnector.insertArtworks(properties.getProperty(DATABASE_KEY), properties.getProperty(DATABASE_ADDRESS), artworkCache.getArtworks());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        } finally {
+                            artworkCache.removeAll();
                         }
                     }
                 });

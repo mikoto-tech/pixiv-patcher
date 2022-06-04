@@ -1,7 +1,7 @@
 package net.mikoto.pixiv.patcher.manager;
 
+import net.mikoto.pixiv.patcher.Patcher;
 import net.mikoto.pixiv.patcher.exception.AlreadyStartedException;
-import net.mikoto.pixiv.patcher.model.Patcher;
 
 import java.util.Set;
 import java.util.concurrent.ExecutorService;

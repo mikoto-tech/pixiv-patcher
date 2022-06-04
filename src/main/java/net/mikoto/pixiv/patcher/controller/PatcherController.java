@@ -3,12 +3,11 @@ package net.mikoto.pixiv.patcher.controller;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import net.mikoto.pixiv.forward.connector.ForwardConnector;
+import net.mikoto.pixiv.patcher.Patcher;
 import net.mikoto.pixiv.patcher.exception.AlreadyStartedException;
+import net.mikoto.pixiv.patcher.factory.ConnectorFactory;
 import net.mikoto.pixiv.patcher.manager.ConfigManager;
-import net.mikoto.pixiv.patcher.manager.ForwardConnectorManager;
 import net.mikoto.pixiv.patcher.manager.PatcherManager;
-import net.mikoto.pixiv.patcher.model.Patcher;
 import net.mikoto.pixiv.patcher.service.ArtworkService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,14 +33,17 @@ public class PatcherController {
     private final ConfigManager configManager;
     @Qualifier("patcherManager")
     private final PatcherManager patcherManager;
-    @Qualifier("forwardConnectorManager")
-    private final ForwardConnectorManager forwardConnectorManager;
+    @Qualifier("databaseConnectorFactory")
+    private final ConnectorFactory databaseConnectorFactory;
+    @Qualifier("forwardConnectorFactory")
+    private final ConnectorFactory forwardConnectorFactory;
 
-    public PatcherController(ArtworkService artworkService, ConfigManager configManager, PatcherManager patcherManager, ForwardConnectorManager forwardConnectorManager) {
+    public PatcherController(ArtworkService artworkService, ConfigManager configManager, PatcherManager patcherManager, ConnectorFactory databaseConnectorFactory, ConnectorFactory forwardConnectorFactory) {
         this.artworkService = artworkService;
         this.configManager = configManager;
         this.patcherManager = patcherManager;
-        this.forwardConnectorManager = forwardConnectorManager;
+        this.databaseConnectorFactory = databaseConnectorFactory;
+        this.forwardConnectorFactory = forwardConnectorFactory;
     }
 
     @RequestMapping(
@@ -84,11 +86,11 @@ public class PatcherController {
     public JSONObject createPatcher(@NotNull HttpServletResponse response, String patcherName, String configName) throws IOException, NoSuchMethodException {
         response.setContentType("application/json;charset=UTF-8");
         Properties properties = configManager.getConfig(configName);
-        ForwardConnector forwardConnector = forwardConnectorManager.createForwardConnector(properties);
         patcherManager.savePatcher(patcherName, new Patcher(
                 properties,
                 artworkService,
-                forwardConnector
+                forwardConnectorFactory.createConnector(properties),
+                databaseConnectorFactory.createConnector(properties)
         ));
         JSONObject jsonObject = new JSONObject();
         jsonObject.fluentPut("success", true);

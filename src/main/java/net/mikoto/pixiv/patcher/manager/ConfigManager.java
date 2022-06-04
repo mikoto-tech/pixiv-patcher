@@ -26,6 +26,10 @@ public interface ConfigManager {
     String KEEP_ALIVE_TIME = "KEEP_ALIVE_TIME";
     String TIMEUNIT = "TIMEUNIT";
     String THREAD_COUNT = "THREAD_COUNT";
+    String SAVE_TO = "SAVE_TO";
+    String CACHE_SIZE = "CACHE_SIZE";
+    String DATABASE_ADDRESS = "DATABASE_ADDRESS";
+    String DATABASE_KEY = "DATABASE_KEY";
 
     /**
      * Add the config.
