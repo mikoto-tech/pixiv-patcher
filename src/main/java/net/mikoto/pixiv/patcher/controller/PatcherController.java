@@ -100,4 +100,13 @@ public class PatcherController {
 
         return (JSONObject) JSON.toJSON(patcher);
     }
+
+    @RequestMapping(
+            "/getThreadPool"
+    )
+    public JSONObject getThreadPool(@NotNull HttpServletResponse response) {
+        response.setContentType("application/json;charset=UTF-8");
+
+        return (JSONObject) JSON.toJSON(patcher.getThreadPoolExecutor());
+    }
 }

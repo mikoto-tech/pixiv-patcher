@@ -253,4 +253,8 @@ public class Patcher {
             throw new AlreadyStartedException("Patcher has already started.");
         }
     }
+
+    public ThreadPoolExecutor getThreadPoolExecutor() {
+        return threadPoolExecutor;
+    }
 }
