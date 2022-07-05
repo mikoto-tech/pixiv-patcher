@@ -35,7 +35,7 @@
     CorePoolSize: <span id="corePoolSize"></span><br>
     LargestPoolSize: <span id="largestPoolSize"></span><br>
     MaximumPoolSize: <span id="maximumPoolSize"></span><br>
-    Shotdown: <span id="shotdown"></span>
+    Shutdown: <span id="shutdown"></span>
     TaskCount: <span id="taskCount"></span>
 </div>
 
@@ -77,7 +77,7 @@
                 document.getElementById("corePoolSize").innerText = responseJson["corePoolSize"];
                 document.getElementById("largestPoolSize").innerText = responseJson["largestPoolSize"];
                 document.getElementById("maximumPoolSize").innerText = responseJson["maximumPoolSize"];
-                document.getElementById("shotdown").innerText = responseJson["shotdown"];
+                document.getElementById("shutdown").innerText = responseJson["shutdown"];
                 document.getElementById("taskCount").innerText = responseJson["taskCount"];
             }
         }
