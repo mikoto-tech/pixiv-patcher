@@ -22,7 +22,7 @@ import static net.mikoto.pixiv.core.util.FileUtil.createFile;
  * @author mikoto
  * @date 2022/4/4 3:24
  */
-@Service("artworkService")
+@Service("artworkPatcherService")
 public class ArtworkPatcherServiceImpl implements ArtworkPatcherService {
     @Value("${mikoto.pixiv.patcher.local.path}")
     private String localPath;
@@ -30,6 +30,8 @@ public class ArtworkPatcherServiceImpl implements ArtworkPatcherService {
     private String[] imageTypes;
     @Value("${mikoto.pixiv.patcher.local.isSaveImage}")
     private boolean isSaveImage;
+    @Value("#{'${mikoto.pixiv.patcher.usingStorage}'.split(',')}")
+    private String[] usingStores;
 
     /**
      * Store the data.
@@ -50,7 +52,7 @@ public class ArtworkPatcherServiceImpl implements ArtworkPatcherService {
             if (isSaveImage) {
                 for (String imageType : imageTypes) {
                     int page = source.getPageCount();
-                    if (imageType.equals("mini") || imageType.equals("thumb")) {
+                    if ("mini".equals(imageType) || "thumb".equals(imageType)) {
                         page = 1;
                     }
 
