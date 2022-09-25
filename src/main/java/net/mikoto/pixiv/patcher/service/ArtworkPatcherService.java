@@ -29,5 +29,5 @@ public interface ArtworkPatcherService extends PatcherService<Artwork> {
     }
 
     @Override
-    void store(Artwork source, Cache<Artwork> cache, String token, Connector connector) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException;
+    void store(Artwork source, Cache<Artwork> cache, String token, ArtworkConnector connector) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException;
 }

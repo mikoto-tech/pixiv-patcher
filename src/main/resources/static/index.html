@@ -17,28 +17,12 @@
 
     <br>
 
-    <button class="btn btn-primary" onclick="sendRequest('/api/patcher/init')" type="button">Init</button>
+    <button class="btn btn-primary" onclick="sendRequest('/patcher/init')" type="button">Init</button>
 
-    <button class="btn btn-primary" onclick="sendRequest('/api/patcher/start')" type="button">Start</button>
+    <button class="btn btn-primary" onclick="sendRequest('/patcher/start')" type="button">Start</button>
 
-    <button class="btn btn-primary" onclick="sendRequest('/api/patcher/stop')" type="button">Stop</button>
+    <button class="btn btn-primary" onclick="sendRequest('/patcher/stop')" type="button">Stop</button>
 </div>
-
-<div class="container mt-3">
-    BeginningArtworkId: <span id="beginningArtworkId"></span><br>
-    TargetArtworkId: <span id="targetArtworkId"></span><br>
-    Threadcount: <span id="threadCount"></span><br>
-    Start: <span id="start"></span><br>
-    <br>
-    ActiveCount: <span id="activeCount"></span><br>
-    CompletedTaskCount: <span id="completedTaskCount"></span><br>
-    CorePoolSize: <span id="corePoolSize"></span><br>
-    LargestPoolSize: <span id="largestPoolSize"></span><br>
-    MaximumPoolSize: <span id="maximumPoolSize"></span><br>
-    Shutdown: <span id="shutdown"></span>
-    TaskCount: <span id="taskCount"></span>
-</div>
-
 <div class="container mt-3">
     <small>
         &copy;<a href="https://github.com/mikoto-tech">Mikoto-Tech</a> 2022
@@ -46,53 +30,14 @@
 </div>
 
 <script>
-    var getPatcherInfoHttpRequest = new XMLHttpRequest();
-    getPatcherInfoHttpRequest.onreadystatechange = function () {
-        if (
-            getPatcherInfoHttpRequest.readyState == 4 &&
-            getPatcherInfoHttpRequest.status == 200
-        ) {
-            if (getPatcherInfoHttpRequest.responseText != "") {
-                let responseJson = JSON.parse(getPatcherInfoHttpRequest.responseText);
-                document.getElementById("beginningArtworkId").innerText = responseJson["beginningArtworkId"];
-                document.getElementById("targetArtworkId").innerText = responseJson["targetArtworkId"];
-                document.getElementById("threadCount").innerText = responseJson["threadCount"];
-                document.getElementById("start").innerText = responseJson["start"];
-            }
-        }
-    };
-    getPatcherInfoHttpRequest.open("GET", "/api/patcher/get", true);
-    getPatcherInfoHttpRequest.send();
-
-    var getThreadPoolHttpRequest = new XMLHttpRequest();
-    getThreadPoolHttpRequest.onreadystatechange = function () {
-        if (
-            getThreadPoolHttpRequest.readyState == 4 &&
-            getThreadPoolHttpRequest.status == 200
-        ) {
-            if (getThreadPoolHttpRequest.responseText != "") {
-                let responseJson = JSON.parse(getThreadPoolHttpRequest.responseText);
-                document.getElementById("activeCount").innerText = responseJson["activeCount"];
-                document.getElementById("completedTaskCount").innerText = responseJson["completedTaskCount"];
-                document.getElementById("corePoolSize").innerText = responseJson["corePoolSize"];
-                document.getElementById("largestPoolSize").innerText = responseJson["largestPoolSize"];
-                document.getElementById("maximumPoolSize").innerText = responseJson["maximumPoolSize"];
-                document.getElementById("shutdown").innerText = responseJson["shutdown"];
-                document.getElementById("taskCount").innerText = responseJson["taskCount"];
-            }
-        }
-    };
-    getThreadPoolHttpRequest.open("GET", "/api/patcher/getThreadPool", true);
-    getThreadPoolHttpRequest.send();
-
     function sendRequest(url) {
         var request = new XMLHttpRequest();
         request.onreadystatechange = function () {
             if (
-                request.readyState == 4 &&
-                request.status == 200
+                request.readyState === 4 &&
+                request.status === 200
             ) {
-                if (request.responseText != "") {
+                if (request.responseText !== "") {
                     let responseJson = JSON.parse(request.responseText);
                     if (responseJson["success"]) {
                         alert("Success")

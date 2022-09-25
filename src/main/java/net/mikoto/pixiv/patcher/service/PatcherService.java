@@ -1,5 +1,6 @@
 package net.mikoto.pixiv.patcher.service;
 
+import net.mikoto.pixiv.core.connector.ArtworkConnector;
 import net.mikoto.pixiv.core.connector.Connector;
 import net.mikoto.pixiv.patcher.model.Cache;
 
@@ -27,7 +28,7 @@ public interface PatcherService<T> {
      * @param cache     The cache the artwork need to store.
      * @param connector The connector in order to get image.
      */
-    void store(T source, Cache<T> cache, String token, Connector connector) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException;
+    void store(T source, Cache<T> cache, String token, ArtworkConnector connector) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException;
 
     /**
      * Patch the data(Source and store).

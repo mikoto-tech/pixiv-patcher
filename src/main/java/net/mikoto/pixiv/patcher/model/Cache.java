@@ -1,6 +1,7 @@
 package net.mikoto.pixiv.patcher.model;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public abstract class Cache<T> {
@@ -19,8 +20,8 @@ public abstract class Cache<T> {
         targets.add(target);
     }
 
-    public Object[] getTargets() {
-        return targets.toArray(new Object[0]);
+    public List<T> getTargets() {
+        return targets.stream().toList();
     }
 
     public void removeAll() {
