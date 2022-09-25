@@ -36,11 +36,10 @@ public class ArtworkPatcherServiceImpl implements ArtworkPatcherService {
      *
      * @param source    The source.
      * @param cache     The cache the artwork need to store.
-     * @param token     The token of the database
      * @param connector The connector in order to get image.
      */
     @Override
-    public void store(Artwork source, Cache<Artwork> cache, String token, ArtworkConnector connector) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void store(Artwork source, Cache<Artwork> cache, ArtworkConnector connector) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (cache != null) {
             cache.addTarget(source);
         } else {

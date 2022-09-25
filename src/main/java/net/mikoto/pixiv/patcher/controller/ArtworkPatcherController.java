@@ -6,9 +6,8 @@ import net.mikoto.pixiv.core.connector.CentralConnector;
 import net.mikoto.pixiv.core.connector.DatabaseConnector;
 import net.mikoto.pixiv.core.connector.DirectConnector;
 import net.mikoto.pixiv.core.connector.ForwardConnector;
-import net.mikoto.pixiv.patcher.model.ArtworkCache;
-import net.mikoto.pixiv.patcher.model.PatcherConfig;
-import net.mikoto.pixiv.patcher.model.Source;
+import net.mikoto.pixiv.patcher.dao.ArtworkRepository;
+import net.mikoto.pixiv.patcher.model.*;
 import net.mikoto.pixiv.patcher.service.ArtworkPatcherService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,18 +36,20 @@ public class ArtworkPatcherController {
     private final DatabaseConnector databaseConnector;
     @Qualifier("centralConnector")
     private final CentralConnector centralConnector;
+    private final ArtworkRepository artworkRepository;
     private final PatcherConfig patcherConfig;
     private ThreadPoolExecutor threadPoolExecutor;
     private List<Queue<Integer>> artworkTasks;
     private boolean startFlag = false;
     private boolean initFlag = false;
 
-    public ArtworkPatcherController(ArtworkPatcherService artworkPatcherService, ForwardConnector forwardConnector, DirectConnector directConnector, DatabaseConnector databaseConnector, CentralConnector centralConnector, PatcherConfig patcherConfig) {
+    public ArtworkPatcherController(ArtworkPatcherService artworkPatcherService, ForwardConnector forwardConnector, DirectConnector directConnector, DatabaseConnector databaseConnector, CentralConnector centralConnector, ArtworkRepository artworkRepository, PatcherConfig patcherConfig) {
         this.artworkPatcherService = artworkPatcherService;
         this.forwardConnector = forwardConnector;
         this.directConnector = directConnector;
         this.databaseConnector = databaseConnector;
         this.centralConnector = centralConnector;
+        this.artworkRepository = artworkRepository;
         this.patcherConfig = patcherConfig;
     }
 
@@ -126,9 +127,12 @@ public class ArtworkPatcherController {
     )
     public JSONObject startPatcher(String token) {
         JSONObject outputJsonObject = new JSONObject();
+        // 是否初始化
         if (initFlag) {
+            // 是否已启动
             if (!startFlag) {
                 startFlag = true;
+                // 遍历任务列表
                 for (Queue<Integer> queue :
                         artworkTasks) {
                     threadPoolExecutor.execute(() -> {
@@ -139,31 +143,58 @@ public class ArtworkPatcherController {
                                 break;
                             }
 
-                            if (artworkCache.isFull()) {
-                                try {
-                                    databaseConnector.insertArtworks(token, artworkCache.getTargets());
-                                } finally {
-                                    artworkCache.removeAll();
-                                }
-                            }
+                            // 遍历所有Storage
+                            for (Storage storage :
+                                    patcherConfig.getUsingStorage()) {
+                                // 数据库
+                                if (storage == Storage.database) {
+                                    // 判断cache是否满 是则存储到数据库
+                                    if (artworkCache.isFull()) {
+                                        if (patcherConfig.getDatabaseType() == DatabaseType.pixiv) {
+                                            databaseConnector.insertArtworks(token, artworkCache.getTargets());
+                                        } else {
+                                            artworkRepository.saveAllAndFlush(artworkCache.getTargets());
+                                        }
+                                    }
 
-                            try {
-                                if (patcherConfig.getUsingSource() == Source.forward) {
-                                    artworkPatcherService.patch(artworkId, forwardConnector, artworkCache, token);
-                                } else {
-                                    artworkPatcherService.patch(artworkId, directConnector, artworkCache, token);
+                                    try {
+                                        if (patcherConfig.getUsingSource() == Source.forward) {
+                                            artworkPatcherService.patch(artworkId, forwardConnector, artworkCache);
+                                        } else {
+                                            artworkPatcherService.patch(artworkId, directConnector, artworkCache);
+                                        }
+                                        Thread.sleep(500);
+                                        break;
+                                    } catch (InvocationTargetException | IOException | InterruptedException |
+                                             NoSuchMethodException | IllegalAccessException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    // 本地
+                                } else if (storage == Storage.local) {
+                                    try {
+                                        if (patcherConfig.getUsingSource() == Source.forward) {
+                                            artworkPatcherService.patch(artworkId, forwardConnector, null);
+                                        } else {
+                                            artworkPatcherService.patch(artworkId, directConnector, null);
+                                        }
+                                        Thread.sleep(500);
+                                        break;
+                                    } catch (InvocationTargetException | IOException | InterruptedException |
+                                             NoSuchMethodException | IllegalAccessException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
-                                Thread.sleep(500);
-                                break;
-                            } catch (InvocationTargetException | IOException | InterruptedException |
-                                     NoSuchMethodException | IllegalAccessException e) {
-                                throw new RuntimeException(e);
                             }
                         }
 
+                        // 结尾判定是否为空
                         if (!artworkCache.isEmpty()) {
                             try {
-                                databaseConnector.insertArtworks(token, artworkCache.getTargets());
+                                if (patcherConfig.getDatabaseType() == DatabaseType.pixiv) {
+                                    databaseConnector.insertArtworks(token, artworkCache.getTargets());
+                                } else {
+                                    artworkRepository.saveAllAndFlush(artworkCache.getTargets());
+                                }
                             } finally {
                                 artworkCache.removeAll();
                             }

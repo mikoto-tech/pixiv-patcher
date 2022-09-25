@@ -28,7 +28,7 @@ public interface PatcherService<T> {
      * @param cache     The cache the artwork need to store.
      * @param connector The connector in order to get image.
      */
-    void store(T source, Cache<T> cache, String token, ArtworkConnector connector) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException;
+    void store(T source, Cache<T> cache, ArtworkConnector connector) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException;
 
     /**
      * Patch the data(Source and store).
@@ -38,9 +38,9 @@ public interface PatcherService<T> {
      * @param cache     The cache the artwork need to store.
      * @return The source.
      */
-    default T patch(int sourceId, Connector connector, Cache<T> cache, String token) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    default T patch(int sourceId, ArtworkConnector connector, Cache<T> cache) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         T source = source(sourceId, connector);
-        store(source, cache, token, connector);
+        store(source, cache, connector);
         return source;
     }
 }
