@@ -40,29 +40,31 @@ public class ArtworkPatcherServiceImpl implements ArtworkPatcherService {
      */
     @Override
     public void store(Artwork source, Cache<Artwork> cache, ArtworkConnector connector) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (cache != null) {
-            cache.addTarget(source);
-        } else {
-            String artworkPath = patcherConfig.getLocal().getPath() + source.getAuthorName() + "-" + source.getArtworkTitle() + "/";
-            createDir(artworkPath);
-            createFile(new File(artworkPath + "artwork.json"), JSONObject.toJSONString(source));
-            if (patcherConfig.getLocal().isSaveImage()) {
-                for (ImageType imageType : patcherConfig.getLocal().getImageTypes()) {
-                    int page = source.getPageCount();
-                    if (imageType == ImageType.mini || imageType == ImageType.thumb) {
-                        page = 1;
-                    }
+        if (source != null) {
+            if (cache != null) {
+                cache.addTarget(source);
+            } else {
+                String artworkPath = patcherConfig.getLocal().getPath() + source.getAuthorName() + "-" + source.getArtworkTitle() + "/";
+                createDir(artworkPath);
+                createFile(new File(artworkPath + "artwork.json"), JSONObject.toJSONString(source));
+                if (patcherConfig.getLocal().isSaveImage()) {
+                    for (ImageType imageType : patcherConfig.getLocal().getImageTypes()) {
+                        int page = source.getPageCount();
+                        if (imageType == ImageType.mini || imageType == ImageType.thumb) {
+                            page = 1;
+                        }
 
-                    for (int i = 0; i < page; i++) {
-                        File file = new File(artworkPath + source.getArtworkId() + "_p" + i + "_" + imageType + ".jpg");
-                        FileOutputStream fileOutputStream2 = new FileOutputStream(file);
-                        char[] resultTypeChars = imageType.toString().toCharArray();
-                        resultTypeChars[0] -= 32;
+                        for (int i = 0; i < page; i++) {
+                            File file = new File(artworkPath + source.getArtworkId() + "_p" + i + "_" + imageType + ".jpg");
+                            FileOutputStream fileOutputStream2 = new FileOutputStream(file);
+                            char[] resultTypeChars = imageType.toString().toCharArray();
+                            resultTypeChars[0] -= 32;
 
-                        String imageUrl = (String) Artwork.class.getMethod("getIllustUrl" + String.valueOf(resultTypeChars)).invoke(source);
-                        imageUrl = imageUrl.replace(source.getArtworkId() + "_p0", source.getArtworkId() + "_p" + i);
-                        fileOutputStream2.write(connector.getImage(imageUrl));
-                        fileOutputStream2.close();
+                            String imageUrl = (String) Artwork.class.getMethod("getIllustUrl" + String.valueOf(resultTypeChars)).invoke(source);
+                            imageUrl = imageUrl.replace(source.getArtworkId() + "_p0", source.getArtworkId() + "_p" + i);
+                            fileOutputStream2.write(connector.getImage(imageUrl));
+                            fileOutputStream2.close();
+                        }
                     }
                 }
             }
